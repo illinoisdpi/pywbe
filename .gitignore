@@ -1,0 +1,4 @@
+.mypy_cache/
+.nox/
+.pytest_cache/
+__pycache__/

@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/pyWBE/__init__.py
+src/pyWBE/hello.py
+src/pyWBE/py.typed
+src/pyWBE.egg-info/PKG-INFO
+src/pyWBE.egg-info/SOURCES.txt
+src/pyWBE.egg-info/dependency_links.txt
+src/pyWBE.egg-info/not-zip-safe
+src/pyWBE.egg-info/requires.txt
+src/pyWBE.egg-info/top_level.txt
+tests/test_hello.py

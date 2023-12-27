@@ -23,3 +23,6 @@ setup(
   packages=find_packages(),
   install_requires=[''] 
 )
+
+if __name__ == "__main__":
+    setup()

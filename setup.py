@@ -20,6 +20,6 @@ setup(
   license='MIT', 
   classifiers=classifiers,
   keywords='Python_Library', 
-  packages=find_packages(),
+  packages=find_packages('src', exclude=['test']),
   install_requires=[''] 
 )

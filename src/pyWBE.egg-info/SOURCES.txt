@@ -1,5 +1,11 @@
+CHANGELOG.txt
+LICENSE.txt
+MANIFEST.in
 README.md
+noxfile.py
 pyproject.toml
+requirements.txt
+requirements_dev.txt
 setup.cfg
 setup.py
 src/pyWBE/__init__.py
@@ -11,4 +17,7 @@ src/pyWBE.egg-info/dependency_links.txt
 src/pyWBE.egg-info/not-zip-safe
 src/pyWBE.egg-info/requires.txt
 src/pyWBE.egg-info/top_level.txt
+src/pyWBE/first_submodule/__init__.py
+src/pyWBE/first_submodule/hello_first_sm.py
+tests/__init__.py
 tests/test_hello.py

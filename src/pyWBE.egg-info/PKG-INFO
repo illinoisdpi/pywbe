@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pyWBE
-Version: 0.0.4
+Version: 0.0.5
 Summary: An open-source Wastewater-based Epidemiology Library in Python
 Home-page: https://github.com/illinoisdpi/pywbe
 Author: Anuj Tiwari

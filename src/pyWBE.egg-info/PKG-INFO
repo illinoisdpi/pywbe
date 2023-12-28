@@ -1,18 +1,17 @@
 Metadata-Version: 2.1
 Name: pyWBE
 Version: 0.0.4
-Summary: A Python Library for wastewater-based epidemiology.
+Summary: An open-source Wastewater-based Epidemiology Library in Python
 Home-page: https://github.com/illinoisdpi/pywbe
 Author: Anuj Tiwari
 Author-email: anujt@uic.edu
 License: MIT
-Keywords: Python_Library
 Platform: win32
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Education
-Classifier: Operating System :: Microsoft :: Windows :: Windows 10
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Programming Language :: Python :: 3
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 Provides-Extra: testing
@@ -38,5 +37,4 @@ With the rising reliance on WBE for tracking a spectrum of challenges, from viru
 ## *We will be uploading the functions soon. Thank you for visiting.
 
 ![Tests](https://github.com/illinoisdpi/pywbe/actions/workflows/tests.yml/badge.svg)
-
 

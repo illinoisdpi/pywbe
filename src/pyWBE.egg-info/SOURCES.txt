@@ -3,7 +3,9 @@ pyproject.toml
 setup.cfg
 setup.py
 src/pyWBE/__init__.py
+src/pyWBE/exceptions.py
 src/pyWBE/hello.py
+src/pyWBE/preliminary_functions.py
 src/pyWBE/py.typed
 src/pyWBE.egg-info/PKG-INFO
 src/pyWBE.egg-info/SOURCES.txt

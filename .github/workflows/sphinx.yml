@@ -29,6 +29,9 @@ jobs:
           python -m pip install sphinx-rtd-theme
           # python -m pip install sphinxcontrib-apidoc
           python -m pip install sphinx-autoapi
+      - name: Clean previous build
+        run: rm -rf docs/_build/
+  
 
       - name: make the sphinx docs
         run: |

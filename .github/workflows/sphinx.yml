@@ -46,5 +46,6 @@ jobs:
           git config --local user.email "skosar2@uic.edu"
           git config --local user.name "skosar2"
           git commit -m 'deploy'
-          git remote add origin https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git push --force origin master:gh-pages
+          git branch -M develop
+          git remote add origin https://github.com/${{ github.repository }}
+          git push --force "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" develop:gh-pages

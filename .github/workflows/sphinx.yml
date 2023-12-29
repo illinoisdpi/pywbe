@@ -1,51 +1,69 @@
-name: docs_pages_workflow
- 
-# execute this workflow automatically when a we push to master
+name: Generate Docs
+
 on:
-  push:
-    branches: 
+   push:
+      branches: 
       - main
-      - develop
- 
+      - develov 
+      
+   workflow_dispatch:
+
 jobs:
- 
-  build_docs_job:
+  generate:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
- 
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.4
-
-      - name: Set up Python
-        uses: actions/setup-python@v2.2.1
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 3.9
- 
-      - name: Install dependencies
+          auto-update-conda: true
+          python-version: "3.10"
+      - name: Install Dependencies
         run: |
-          python -m pip install -U sphinx
-          python -m pip install sphinx-rtd-theme
-          # python -m pip install sphinxcontrib-apidoc
-          python -m pip install sphinx-autoapi
-      - name: Clean previous build
-        run: rm -rf docs/_build/
-  
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          python -m pip install -e .[molecules]
+          python -m pip install sphinx sphinx-rtd-theme m2r mistune==0.8.4
 
-      - name: make the sphinx docs
-        run: sphinx-build -b html docs/source docs/build/html
-
-      - name: Init new repo in dist folder and commit generated files
+      - uses: actions/checkout@v3
+        with:
+          ref: docs
+      - name: Update Docs to Main
         run: |
-          cd docs/build/html/
-          git init
-          git config --global --add safe.directory /github/workspace/docs/build/html
-          touch .nojekyll
-          git add -A
-          git config --local user.email "skosar2@uic.edu"
-          git config --local user.name "skosar2"
-          git commit -m 'deploy'
-          git branch -M develop
-          git remote add origin https://github.com/${{ github.repository }}
-          git push --force "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" develop:gh-pages
+          git fetch --all
+          git reset --hard origin/main
+
+      - name: Generate Documentation
+        run: |
+          mv docs/index.rst .
+          rm docs/*.rst || true
+          mv index.rst docs/
+          rm README.rst || true
+          rm docs/README.rst || true
+          rm sklearn_to_astartes.rst || true
+          rm docs/sklearn_to_astartes.rst || true
+          rm CONTRIBUTING.rst || true
+          rm docs/CONTRIBUTING.rst || true
+          m2r README.md
+          m2r CONTRIBUTING.md
+          m2r sklearn_to_astartes.md
+          mv README.rst docs
+          mv CONTRIBUTING.rst docs
+          mv sklearn_to_astartes.rst docs
+          cd docs
+          rm *.html *.doctree || true
+          sphinx-apidoc -f -o . ..
+          make clean
+          make html
+          cp -r _build/html/* .
+          cp -r _build/doctrees/* .
+          echo "" > .nojekyll
+
+      - name: Push to Docs Branch
+        run: |
+          git add .
+          git commit -m "Automated Docs Update" -a || true
+          git push -f
+

@@ -1,72 +1,57 @@
-name: Generate Docs
+name: Publish Python Package
 
 on:
-   push:
-      branches: 
+  push:
+    branches:
       - main
-      - develov 
-      
-   workflow_dispatch:
+  # - push
+  # - pull_request
 
 jobs:
-  generate:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -el {0}
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ['3.9']
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: "3.10"
-      - name: Install Dependencies
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          python -m pip install -e .[molecules]
-          python -m pip install sphinx sphinx-rtd-theme m2r mistune==0.8.4
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install nox
+    - name: Test with nox
+      run: nox
+      
+  deploy:
+    needs: test
+    
 
-      - uses: actions/checkout@v3
-        with:
-          ref: docs
-      - name: Update Docs to Main
-        run: |
-          git fetch --all
-          git reset --hard origin/main
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
 
-      - name: Generate Documentation
-        run: |
-          mv docs/index.rst .
-          rm docs/*.rst || true
-          mv index.rst docs/
-          rm README.rst || true
-          rm docs/README.rst || true
-          rm sklearn_to_astartes.rst || true
-          rm docs/sklearn_to_astartes.rst || true
-          rm CONTRIBUTING.rst || true
-          rm docs/CONTRIBUTING.rst || true
-          m2r README.md
-          m2r CONTRIBUTING.md
-          m2r sklearn_to_astartes.md
-          mv README.rst docs
-          mv CONTRIBUTING.rst docs
-          mv sklearn_to_astartes.rst docs
-          cd docs
-          rm *.html *.doctree || true
-          sphinx-apidoc -f -o . ..
-          make clean
-          make html
-          cp -r _build/html/* .
-          cp -r _build/doctrees/* .
-          echo "" > .nojekyll
-
-      - name: Push to Docs Branch
-        env:
-             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git add .
-          git commit -m "Automated Docs Update" -a || true
-          git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
 

@@ -62,7 +62,11 @@ jobs:
           echo "" > .nojekyll
 
       - name: Push to Docs Branch
+        env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add .
           git commit -m "Automated Docs Update" -a || true
-          git push -f
+          git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+

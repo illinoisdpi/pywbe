@@ -1,11 +1,24 @@
 name: Publish Python Package
 
+# on:
+#   push:
+#     branches:
+#       - main
+  # - pull_request
+
+#Workflow when something is changed in src or when we push to main
+
 on:
   push:
     branches:
       - main
-  # - push
-  # - pull_request
+    paths:
+      - 'src/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
 
 jobs:
   test:

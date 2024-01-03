@@ -2,3 +2,5 @@
 .nox/
 .pytest_cache/
 __pycache__/
+dist/
+.coverage

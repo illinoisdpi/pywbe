@@ -1,24 +1,10 @@
 name: Publish Python Package
 
-# on:
-#   push:
-#     branches:
-#       - main
-  # - pull_request
-
-#Workflow when something is changed in src or when we push to main
-
 on:
   push:
     branches:
       - main
-    paths:
-      - 'src/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'src/**'
+      - python-publish
 
 jobs:
   test:
@@ -40,28 +26,40 @@ jobs:
         pip install nox
     - name: Test with nox
       run: nox
-      
+    # ... (rest of your test job)
+
   deploy:
     needs: test
-    
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
+    # Bump version
+    - name: Bump package version
+      id: bump_version
+      uses: mathieudutour/github-tag-action@v5.6
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        default_bump: patch
+        # Other configuration for version bumping can be specified here
+
+    # Set up Python
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
         python-version: '3.x'
+    
+    # Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install build
+
+    # Build package
     - name: Build package
       run: python -m build
+
+    # Publish package
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

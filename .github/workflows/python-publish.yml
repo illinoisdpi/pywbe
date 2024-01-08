@@ -1,11 +1,25 @@
 name: Publish Python Package
 
-on:
-  push:
-    branches:
-      - main
-  # - push
-  # - pull_request
+
+#Workflow when something is changed in src or when we push to main
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'src/**'
+#   pull_request:
+#     branches:
+#       - main
+#     paths:
+#       - 'src/**'
+
+#Workflow to manually publish the package 
+
+on: 
+  workflow_dispatch:
+
 
 jobs:
   test:
@@ -30,8 +44,6 @@ jobs:
       
   deploy:
     needs: test
-    
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -39,6 +51,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      
+# Clean dist directory
+    - name: Clean dist directory
+      run: rm -rf dist/*
+
     - name: Set up Python
       uses: actions/setup-python@v3
       with:

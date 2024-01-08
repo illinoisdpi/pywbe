@@ -3,3 +3,6 @@ tox>=4.10
 pytest>=7.4
 pytest-cov>=4.0
 mypy>=1.7
+numpy==1.26.0
+pandas==2.1.1
+matplotlib==3.7.0

@@ -47,9 +47,23 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = 
         raise ValueError(f"The 'plot_type' parameter can only be 'linear' or 'log'. {plot_type} is invalid.")
 
 
-def calculate_weekly_concentration_perc_change(conc_data: pd.Series):
-    raise FunctionNotImplementedError("""The function to calculate weekly percentage
-                                      changes in concentration has not been implemented.""")
+def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Series:
+    """
+    This function computes the weekly percentage change in concentration levels
+    in the given time-series data.
+    :param conc_data: The concentration data, assumed to have a periodicity of 1 week
+    :type conc_data: pd.Series
+    :return: Returns the weekly percentage change in concentration levels
+    :rtype: pd.Series
+    """
+
+    shifted_series = conc_data.copy(deep=True)
+    shifted_series.iloc[:-1] = conc_data.iloc[1:]
+    shifted_series[-1] = conc_data[-1]
+
+    perc_change = (shifted_series - conc_data) / conc_data * 100
+
+    return perc_change
 
 
 def analyze_trends(data, analysis_type):

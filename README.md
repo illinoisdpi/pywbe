@@ -64,5 +64,3 @@ Coming soon
 Coming soon 
 
 ## *We will be uploading the functions soon. Thank you for visiting.
-
-![Tests](https://github.com/illinoisdpi/pywbe/actions/workflows/tests.yml/badge.svg)

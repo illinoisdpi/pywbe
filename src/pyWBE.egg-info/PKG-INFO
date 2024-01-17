@@ -14,7 +14,16 @@ Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Education
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.20
 Provides-Extra: testing
+Requires-Dist: pytest>=6.0; extra == "testing"
+Requires-Dist: pytest-cov>=2.0; extra == "testing"
+Requires-Dist: mypy>=0.910; extra == "testing"
+Requires-Dist: flake8>=3.9; extra == "testing"
+Requires-Dist: tox>=3.24; extra == "testing"
+Requires-Dist: numpy>=1.26; extra == "testing"
+Requires-Dist: pandas>=2.1; extra == "testing"
+Requires-Dist: matplotlib>=3.7; extra == "testing"
 
 # pyWBE - An open-source Wastewater-based Epidemiology Library in Python
 

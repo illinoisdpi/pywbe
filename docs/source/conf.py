@@ -14,7 +14,14 @@ release = '0.0.5'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = ['sphinx.ext.autodoc',  # if you want to use Sphinx's autodoc as well
+    'autoapi.extension',
+]
+
+# Path to the root of your code, relative to conf.py
+autoapi_dirs = ['../../src']
+autoapi_ignore = ['*migrations*']  # Example: ignore any migrations directories
+
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

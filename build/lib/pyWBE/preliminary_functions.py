@@ -67,6 +67,7 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     return perc_change.iloc[:-1]
 
 
+
 def analyze_trends(data, analysis_type):
     raise FunctionNotImplementedError("""The function to analyze trends has not been implemented.""")
 

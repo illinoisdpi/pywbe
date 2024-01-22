@@ -8,7 +8,8 @@ name: docs_pages_workflow
 
 #Workflow when something is changed in src or when we push to main 
 
-on:
+on: 
+  workflow_dispatch:
   push:
     branches:
       - main

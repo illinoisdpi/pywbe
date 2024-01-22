@@ -9,7 +9,7 @@
 project = 'pywbe'
 copyright = '2023, skosar2'
 author = 'skosar2'
-release = '0.0.5'
+release = '0.0.6'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

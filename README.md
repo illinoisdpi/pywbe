@@ -13,7 +13,7 @@
     <tr>
       <td><img alt="PyPI - Python Version" src="https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue"></td>
       <td><img alt="Test Status" src="https://github.com/illinoisdpi/pywbe/actions/workflows/tests.yml/badge.svg"></td>
-      <td><img alt="PyPI - Python Version" src="https://img.shields.io/badge/pypi-v0.0.5-blue"></td>
+      <td><img alt="PyPI - Python Version" src="https://img.shields.io/badge/pypi-v0.0.6-blue"></td>
     </tr>
     <tr>
       <td><img alt="PyPI - License" src="https://img.shields.io/badge/License-MIT-green"></td>

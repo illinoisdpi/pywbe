@@ -115,11 +115,11 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
         model = LinearRegression()
         model.fit(X_train, y_train)
 
-        one_time_step_pred = model.predict(training_vals[-1])
+        one_time_step_pred = model.predict(training_vals[-1].reshape(-1, 1))
 
         time_diff = data.index[-1] - data.index[-2]
         next_index = data.index[-1] + time_diff
-        data[next_index] = one_time_step_pred
+        data[next_index] = one_time_step_pred[0]
 
         return data
 

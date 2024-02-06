@@ -28,5 +28,5 @@ def test_single_instance_forecast(seed, num_vals, A, b, start_date, window_start
     series = pd.Series(data[:-1], index=dates)
     window = pd.date_range(start=window_start_date, end=dates.max(), freq=freq)
     test_input_data, test_window, expected = series, window, data[-1]
-    result = preliminary_functions.forecast_single_instance(test_input_data, test_window)
+    result = preliminary_functions.forecast_single_instance(test_input_data, test_window).iloc[-1]
     assert result == pytest.approx(expected, abs=0.01)

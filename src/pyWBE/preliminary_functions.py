@@ -68,6 +68,7 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
 
 
 def analyze_trends(data, analysis_type):
+    # Uptrend, Down trend, stationary trend, cyclic trend
     raise FunctionNotImplementedError("""The function to analyze trends has not been implemented.""")
 
 

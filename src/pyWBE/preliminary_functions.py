@@ -108,7 +108,7 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
     elif window_duration > data_duration:
         raise DurationExceededError("""Window length is too long. Should not exceed given data's duration.""")
     else:
-        training_vals = data[data.index.isin(window)].to_numpy()
+        training_vals = data[data.index.isin(window)].to_numpy().reshape(-1, 1)
         X_train = training_vals[:-1]
         y_train = training_vals[1:]
 

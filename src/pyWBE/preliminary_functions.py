@@ -96,7 +96,7 @@ def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.Data
     :return: Returns a Pandas DataFrame that contain the Trend, Seasonal,
     and Residual components computed using the given model type. Can be
     plotted using the "plot" method of Pandas DataFrame class.\n
-    : rtype: pd.DataFrame\n
+    :rtype: pd.DataFrame\n
     """
     decompose_result = seasonal_decompose(data, model=model_type)
     return decompose_result

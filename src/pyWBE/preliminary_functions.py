@@ -73,7 +73,7 @@ def analyze_trends(data, analysis_type):
 
 
 def change_point_detection(data: pd.Series, model: str = "l2",
-                           min_size: int = 28, penalty: int = 1):
+                           min_size: int = 28, penalty: int = 1) -> list:
     """
     This function uses the PELT (Pruned Exact Linear Time) function
     of the Ruptures library to analyze the given time-series data

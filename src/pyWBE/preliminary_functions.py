@@ -14,6 +14,7 @@ from pyWBE.exceptions import FunctionNotImplementedError
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import ruptures as rpt
 
 
 def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = "linear") -> None:
@@ -71,8 +72,30 @@ def analyze_trends(data, analysis_type):
     raise FunctionNotImplementedError("""The function to analyze trends has not been implemented.""")
 
 
-def change_point_detection(time_instance, method):
-    raise FunctionNotImplementedError("""The function to change point detection has not been implemented.""")
+def change_point_detection(data: pd.Series, model: str = "l2",
+                           min_size: int = 28, penalty: int = 1):
+    """
+    This function uses the PELT (Pruned Exact Linear Time) function
+    of the Ruptures library to analyze the given time-series data
+    for change point detection.\n
+    :param data: A Pandas Series containing the time-series data
+    whose change points need to be detected.\n
+    :type data: pd.Series\n
+    :param model: The model used by PELT to perform the analysis.
+    Allowed types include "l1", "l2", and "rbf".\n
+    :type model: str\n
+    :param min_size: The minimum separation (time steps) between
+    two consecutive change points detected by the model.\n
+    :type min_size: int\n
+    :param penalty: The penalty value used during prediction of
+    change points.\n
+    :type penalty: int\n
+    :return: Returns a sorted list of breakpoints.\n
+    :rtype: list\n
+    """
+    algo = rpt.Pelt(model=model, min_size=min_size).fit(data)
+    result = algo.predict(pen=penalty)
+    return result
 
 
 def normalize_viral_load(data, normalization_type):

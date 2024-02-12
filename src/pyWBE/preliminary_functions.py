@@ -67,7 +67,7 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     return perc_change.iloc[:-1]
 
 
-def analyze_trends(data: pd.Series) -> list:
+def analyze_trends(data: pd.Series) -> list[float]:
     """
     This function computes the trend line for the given data.\n
     :param data: The time-series data (assumed to be sorted
@@ -80,8 +80,7 @@ def analyze_trends(data: pd.Series) -> list:
     z = np.polyfit(range(len(data)), data, 1)
     p = np.poly1d(z)
     trend_vals = p(range(len(data)))
-    trend_vals = list(trend_vals)
-    return trend_vals
+    return list(trend_vals)
 
 
 def change_point_detection(time_instance, method):

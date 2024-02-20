@@ -67,8 +67,20 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     return perc_change.iloc[:-1]
 
 
-def analyze_trends(data, analysis_type):
-    raise FunctionNotImplementedError("""The function to analyze trends has not been implemented.""")
+def analyze_trends(data: pd.Series) -> list[float]:
+    """
+    This function computes the trend line for the given data.\n
+    :param data: The time-series data (assumed to be sorted
+    in an increasing order of time).\n
+    :type data: pd.Series\n
+    :return: Returns the trend line values which can be plotted
+    as date v/s returned trend line values.\n
+    :rtype: list
+    """
+    z = np.polyfit(range(len(data)), data, 1)
+    p = np.poly1d(z)
+    trend_vals = p(range(len(data)))
+    return list(trend_vals)
 
 
 def change_point_detection(time_instance, method):

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from pyWBE import preliminary_functions
+import ruptures as rpt
 
 
 @pytest.mark.parametrize("test_input, expected", [
@@ -13,3 +14,21 @@ from pyWBE import preliminary_functions
 ])
 def test_perc_conc_change(test_input, expected):
     assert preliminary_functions.calculate_weekly_concentration_perc_change(test_input).equals(expected)
+
+
+@pytest.mark.parametrize("model", [
+    ("l1"),
+    ("l2"),
+    ("rbf")
+])
+def test_change_point_detection(model):
+    n_samples, dim, sigma = 1000, 3, 4
+    n_bkps = 4  # number of breakpoints
+    penalty = 10
+    signal, bkps = rpt.pw_constant(n_samples, dim, n_bkps, noise_std=sigma)
+
+    # detection
+    algo = rpt.Pelt(model=model).fit(signal)
+    result = algo.predict(pen=penalty)
+
+    assert preliminary_functions.change_point_detection(signal, model, 2, penalty) == result

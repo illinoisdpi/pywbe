@@ -10,7 +10,6 @@ Note: Add type-hints and docstrings to functions as they are implemented.
 """
 
 
-from pyWBE.exceptions import FunctionNotImplementedError
 from pyWBE.exceptions import DurationTooShortError, DurationExceededError
 import pandas as pd
 import numpy as np

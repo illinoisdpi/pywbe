@@ -10,10 +10,13 @@ Note: Add type-hints and docstrings to functions as they are implemented.
 """
 
 
-from pyWBE.exceptions import FunctionNotImplementedError
+from pyWBE.exceptions import DurationTooShortError, DurationExceededError
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from statsmodels.tsa.seasonal import seasonal_decompose
+import ruptures as rpt
 
 
 def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = "linear") -> None:
@@ -67,21 +70,124 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     return perc_change.iloc[:-1]
 
 
-def analyze_trends(data, analysis_type):
-    raise FunctionNotImplementedError("""The function to analyze trends has not been implemented.""")
+def analyze_trends(data: pd.Series) -> list[float]:
+    """
+    This function computes the trend line for the given data.\n
+    :param data: The time-series data (assumed to be sorted
+    in an increasing order of time).\n
+    :type data: pd.Series\n
+    :return: Returns the trend line values which can be plotted
+    as date v/s returned trend line values.\n
+    :rtype: list
+    """
+    z = np.polyfit(range(len(data)), data, 1)
+    p = np.poly1d(z)
+    trend_vals = p(range(len(data)))
+    return list(trend_vals)
 
 
-def change_point_detection(time_instance, method):
-    raise FunctionNotImplementedError("""The function to change point detection has not been implemented.""")
+def change_point_detection(data: pd.Series, model: str = "l2",
+                           min_size: int = 28, penalty: int = 1):
+    """
+    This function uses the PELT (Pruned Exact Linear Time) function
+    of the Ruptures library to analyze the given time-series data
+    for change point detection.\n
+    :param data: A Pandas Series containing the time-series data
+    whose change points need to be detected.\n
+    :type data: pd.Series\n
+    :param model: The model used by PELT to perform the analysis.
+    Allowed types include "l1", "l2", and "rbf".\n
+    :type model: str\n
+    :param min_size: The minimum separation (time steps) between
+    two consecutive change points detected by the model.\n
+    :type min_size: int\n
+    :param penalty: The penalty value used during prediction of
+    change points.\n
+    :type penalty: int\n
+    :return: Returns a sorted list of breakpoints.\n
+    :rtype: list\n
+    """
+    algo = rpt.Pelt(model=model, min_size=min_size).fit(data)
+    result = algo.predict(pen=penalty)
+    return result
 
 
-def normalize_viral_load(data, normalization_type):
-    raise FunctionNotImplementedError("""The function to normalize viral load has not been implemented.""")
+def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: str) -> pd.Series:
+    """
+    This function normalizes the time-series data given in
+    the "to_normalize" column of the data using the values
+    in the "normalize_by" column of the data.\n
+    :param data: The Pandas DataFrame containing the relevant data.\n
+    :type data: Pandas DataFrame\n
+    :param to_normalize: The name of the column containing the data to be normalized.\n
+    :type to_normalize: str\n
+    :param normalize_by: The name of the column containing the data to normalize by.\n
+    :type normalize_by: str\n
+    :return: The normalized data.\n
+    :rtype: Pandas Series\n
+    """
+    if to_normalize in data.columns and normalize_by in data.columns:
+        return data[to_normalize] / data[normalize_by].mean()
+    else:
+        raise ValueError(f"The columns {to_normalize} and/or {normalize_by} are not present in the given data.")
 
 
-def forecast_single_instance(data, model_type):
-    raise FunctionNotImplementedError("""The function to forecast single instances from data has not been implemented.""")
+def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Series:
+    """
+    This function predicts the value of the given time-series data
+    a single time-step into the future using a Linear Regression
+    model trained on the data specified by the parameter "window_length".\n
+    :param data: A Pandas Series, assumed to have dates as its indices,
+    containing the time-series data whose value needs to be predicted
+    in the future.\n
+    :type data: pd.Series\n
+    :param window: A Pandas DateTimeIndex containing date range for
+    the "data" that must be used to train the Linear Regression model.
+    Minimum length must be 1 week and maximum length can be the entire
+    date range of the "data".\n
+    :type window: pd.DateTimeIndex\n
+    :return: Returns the original "data" with the next time-step
+    prediction appended to it.\n
+    :rtype: pd.Series\n
+    """
+    one_week = pd.Timedelta(days=7)
+    window_duration = window.max() - window.min()
+    data_duration = data.index.max() - data.index.min()
+
+    if window_duration < one_week:
+        raise DurationTooShortError("""Window length is too short. Should be atleast 1 week.""")
+    elif window_duration > data_duration:
+        raise DurationExceededError("""Window length is too long. Should not exceed given data's duration.""")
+    else:
+        training_vals = data[data.index.isin(window)].to_numpy().reshape(-1, 1)
+        X_train = training_vals[:-1]
+        y_train = training_vals[1:]
+
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+
+        one_time_step_pred = model.predict(training_vals[-1].reshape(-1, 1))
+
+        time_diff = data.index[-1] - data.index[-2]
+        next_index = data.index[-1] + time_diff
+        data[next_index] = one_time_step_pred[0]
+
+        return data
 
 
-def detect_seasonality(data):
-    raise FunctionNotImplementedError("""The function to detect seasonality in data has not been implemented.""")
+def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.DataFrame:
+    """
+    This function analyzes a given time-series data for seasonality.\n
+    :param data: A Pandas Series, assumed to have dates as its indices
+    with the corresponding values of the time-series data.\n
+    :type data: pd.Series\n
+    :param model_type: Can be "additive" or "multiplicative", determines
+    the type of seasonality model assumed for the data.\n
+    :type model_type: str\n
+    :return: Returns a Pandas DataFrame that contain the Trend, Seasonal,
+    and Residual components computed using the given model type. Can be
+    plotted using the "plot" method of Pandas DataFrame class.\n
+    :rtype: pd.DataFrame\n
+    """
+    decompose_result = seasonal_decompose(data, model=model_type)
+    return decompose_result

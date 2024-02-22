@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from pyWBE import preliminary_functions
+import math
 import ruptures as rpt
 
 
@@ -31,6 +32,33 @@ def test_single_instance_forecast(seed, num_vals, A, b, start_date, window_start
     test_input_data, test_window, expected = series, window, data[-1]
     result = preliminary_functions.forecast_single_instance(test_input_data, test_window).iloc[-1]
     assert result == pytest.approx(expected, abs=0.01)
+
+
+@pytest.mark.parametrize("model_type", [
+    ("additive"),
+    ("multiplicative")
+])
+def test_seasonality_detection(model_type):
+    s = np.cos(np.linspace(start=0, stop=10*2*math.pi, num=100))
+    t = np.linspace(start=0, stop=2*math.pi, num=100)
+    r = np.clip(np.random.normal(size=t.shape), 0, 0.3)
+
+    if model_type == "additive":
+        vals = s + t + r
+    elif model_type == "multiplicative":
+        vals = s * t * r + 2   # Adding 2 for scaling
+    else:
+        return
+    dates = pd.date_range(start="02/06/2024", periods=len(vals), freq='D')
+    series = pd.Series(vals, index=dates)
+
+    output = preliminary_functions.detect_seasonality(series, model_type)
+
+    diff_s = (output.seasonal - s).sum() / len(s)
+    diff_t = (output.trend - t).sum() / len(t)
+    diff_r = (output.resid - r).sum() / len(r)
+
+    assert (diff_s + diff_t + diff_r) / 3 == pytest.approx(0, abs=0.35)
 
 
 def test_normalize_viral_load():

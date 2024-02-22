@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
+from statsmodels.tsa.seasonal import seasonal_decompose
 import ruptures as rpt
 
 
@@ -175,5 +176,19 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
         return data
 
 
-def detect_seasonality(data):
-    raise FunctionNotImplementedError("""The function to detect seasonality in data has not been implemented.""")
+def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.DataFrame:
+    """
+    This function analyzes a given time-series data for seasonality.\n
+    :param data: A Pandas Series, assumed to have dates as its indices
+    with the corresponding values of the time-series data.\n
+    :type data: pd.Series\n
+    :param model_type: Can be "additive" or "multiplicative", determines
+    the type of seasonality model assumed for the data.\n
+    :type model_type: str\n
+    :return: Returns a Pandas DataFrame that contain the Trend, Seasonal,
+    and Residual components computed using the given model type. Can be
+    plotted using the "plot" method of Pandas DataFrame class.\n
+    :rtype: pd.DataFrame\n
+    """
+    decompose_result = seasonal_decompose(data, model=model_type)
+    return decompose_result

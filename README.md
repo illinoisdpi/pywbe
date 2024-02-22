@@ -39,9 +39,7 @@ Installation steps coming up.
 ### Source
 To install `pyWBE` from source for development, see our GitHub.
 
-## Statement of Need
-
-![Tests](https://github.com/illinoisdpi/pywbe/actions/workflows/tests.yml/badge.svg)
+## Statement of Need 
 
 Wastewater-based epidemiology (WBE) is a dynamic tool used historically to monitor various pathogens and contaminants in communities, from viruses such as COVID-19, influenza, and RSV to challenges like opioid detection. With the COVID-19 pandemic, WBE's role as an early detection and monitoring system has grown significantly. However, despite its potential, the WBE field lacks a centralized computational library, leading to redundancies and inefficiencies in data handling and analysis.
 

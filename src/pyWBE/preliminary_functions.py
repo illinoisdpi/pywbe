@@ -191,3 +191,42 @@ def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.Data
     """
     decompose_result = seasonal_decompose(data, model=model_type)
     return decompose_result
+
+
+def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, max_lag: int = 3):
+    """
+    This function computes the lead and lag correlations between two
+    given time-series data.\n
+    :param x: The first time-series data.\n
+    :type x: pd.Series\n
+    :param y: The second time-series data.\n
+    :type y: pd.Series\n
+    :param time_instances: The number of time instances to be considered
+    for the correlation analysis.\n
+    :type time_instances: int\n
+    :param max_lag: The maximum lag time to be considered for the
+    correlation analysis.\n
+    :type max_lag: int\n
+    :return: Returns a the lead and lag correlations between the
+    given time-series data\n
+    :rtype: Tuple\n
+    """
+
+    x, y = x.iloc[:-time_instances].to_frame(), y.iloc[:-time_instances].to_frame()
+    Is = range(-max_lag, max_lag)
+    dfs = pd.DataFrame()
+
+    for i in Is:
+        x_shifted = x.shift(i)
+        x_shifted['target_class'] = y
+        dfs[i] = x_shifted.corr(method='spearman')['target_class']
+
+    dfs_T = dfs.iloc[:-1, :].T
+    correlations = pd.DataFrame()
+    correlations['Lags'] = dfs_T.idxmax()
+    correlations['values'] = dfs_T.max()
+
+    lead_corr = correlations[[correlations['values'] >= 0] and correlations['Lags'] <= 0]  # With only lag time
+    lag_corr = correlations[correlations['values'] >= 0]   # with lead and lag time both
+
+    return lead_corr, lag_corr

@@ -15,3 +15,21 @@ class FunctionNotImplementedError(Exception):
     """
     def __init__(self, message: str) -> None:
         super().__init__(message)
+
+
+class DurationExceededError(Exception):
+    """
+    This class handles the error when window duration is greater than the
+    data duration.
+    """
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
+class DurationTooShortError(Exception):
+    """
+    This class handles the error when window duration is too small for
+    training.
+    """
+    def __init__(self, message: str) -> None:
+        super().__init__(message)

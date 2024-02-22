@@ -10,10 +10,11 @@ Note: Add type-hints and docstrings to functions as they are implemented.
 """
 
 
-from pyWBE.exceptions import FunctionNotImplementedError
+from pyWBE.exceptions import DurationTooShortError, DurationExceededError
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.seasonal import seasonal_decompose
 import ruptures as rpt
 
@@ -131,8 +132,47 @@ def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: st
         raise ValueError(f"The columns {to_normalize} and/or {normalize_by} are not present in the given data.")
 
 
-def forecast_single_instance(data, model_type):
-    raise FunctionNotImplementedError("""The function to forecast single instances from data has not been implemented.""")
+def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Series:
+    """
+    This function predicts the value of the given time-series data
+    a single time-step into the future using a Linear Regression
+    model trained on the data specified by the parameter "window_length".\n
+    :param data: A Pandas Series, assumed to have dates as its indices,
+    containing the time-series data whose value needs to be predicted
+    in the future.\n
+    :type data: pd.Series\n
+    :param window: A Pandas DateTimeIndex containing date range for
+    the "data" that must be used to train the Linear Regression model.
+    Minimum length must be 1 week and maximum length can be the entire
+    date range of the "data".\n
+    :type window: pd.DateTimeIndex\n
+    :return: Returns the original "data" with the next time-step
+    prediction appended to it.\n
+    :rtype: pd.Series\n
+    """
+    one_week = pd.Timedelta(days=7)
+    window_duration = window.max() - window.min()
+    data_duration = data.index.max() - data.index.min()
+
+    if window_duration < one_week:
+        raise DurationTooShortError("""Window length is too short. Should be atleast 1 week.""")
+    elif window_duration > data_duration:
+        raise DurationExceededError("""Window length is too long. Should not exceed given data's duration.""")
+    else:
+        training_vals = data[data.index.isin(window)].to_numpy().reshape(-1, 1)
+        X_train = training_vals[:-1]
+        y_train = training_vals[1:]
+
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+
+        one_time_step_pred = model.predict(training_vals[-1].reshape(-1, 1))
+
+        time_diff = data.index[-1] - data.index[-2]
+        next_index = data.index[-1] + time_diff
+        data[next_index] = one_time_step_pred[0]
+
+        return data
 
 
 def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.DataFrame:

@@ -32,7 +32,7 @@ def test_single_instance_forecast(seed, num_vals, A, b, start_date, window_start
     result = preliminary_functions.forecast_single_instance(test_input_data, test_window).iloc[-1]
     assert result == pytest.approx(expected, abs=0.01)
 
-  
+
 def test_normalize_viral_load():
     data = pd.DataFrame({"to_normalize": [1, 2, 3, 4, 5], "normalize_by": [1, 2, 3, 4, 5]})
     assert preliminary_functions.normalize_viral_load(data, "to_normalize", "normalize_by").equals(pd.Series([1, 2, 3, 4, 5])/3)

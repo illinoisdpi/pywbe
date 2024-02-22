@@ -7,3 +7,4 @@ numpy==1.26.0
 pandas==2.1.1
 matplotlib==3.7.0
 statsmodels==0.14.1
+ruptures==1.1.9

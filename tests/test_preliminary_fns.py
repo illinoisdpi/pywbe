@@ -16,6 +16,11 @@ def test_perc_conc_change(test_input, expected):
     assert preliminary_functions.calculate_weekly_concentration_perc_change(test_input).equals(expected)
 
 
+def test_normalize_viral_load():
+    data = pd.DataFrame({"to_normalize": [1, 2, 3, 4, 5], "normalize_by": [1, 2, 3, 4, 5]})
+    assert preliminary_functions.normalize_viral_load(data, "to_normalize", "normalize_by").equals(pd.Series([1, 2, 3, 4, 5])/3)
+
+
 @pytest.mark.parametrize("model", [
     ("l1"),
     ("l2"),

@@ -110,8 +110,24 @@ def change_point_detection(data: pd.Series, model: str = "l2",
     return result
 
 
-def normalize_viral_load(data, normalization_type):
-    raise FunctionNotImplementedError("""The function to normalize viral load has not been implemented.""")
+def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: str) -> pd.Series:
+    """
+    This function normalizes the time-series data given in
+    the "to_normalize" column of the data using the values
+    in the "normalize_by" column of the data.\n
+    :param data: The Pandas DataFrame containing the relevant data.\n
+    :type data: Pandas DataFrame\n
+    :param to_normalize: The name of the column containing the data to be normalized.\n
+    :type to_normalize: str\n
+    :param normalize_by: The name of the column containing the data to normalize by.\n
+    :type normalize_by: str\n
+    :return: The normalized data.\n
+    :rtype: Pandas Series\n
+    """
+    if to_normalize in data.columns and normalize_by in data.columns:
+        return data[to_normalize] / data[normalize_by].mean()
+    else:
+        raise ValueError(f"The columns {to_normalize} and/or {normalize_by} are not present in the given data.")
 
 
 def forecast_single_instance(data, model_type):

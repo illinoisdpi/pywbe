@@ -44,13 +44,19 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = 
         plt.xlabel(series_x.name)
         plt.ylabel(series_y.name)
         plt.title("Time Series Visualization")
-        plt.show()
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        return buf
     elif plot_type == "log":
         plt.plot(series_x, np.log(series_y))
         plt.xlabel(series_x.name)
         plt.ylabel(f"{series_y.name} (log)")
         plt.title("Time Series Visualization (log scale)")
-        plt.show()
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        return buf
     else:
         raise ValueError(f"The 'plot_type' parameter can only be 'linear' or 'log'. {plot_type} is invalid.")
 

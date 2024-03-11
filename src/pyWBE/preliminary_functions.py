@@ -18,11 +18,10 @@ from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.seasonal import seasonal_decompose
 import ruptures as rpt
 import calmap
-import io
 import matplotlib.colors as mcolors
 
 
-def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = "linear") -> None:
+def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str, plot_type: str = "linear"):
     """
     This function plots the given time-series data for easy visualization.
 
@@ -32,6 +31,8 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = 
     :param series_y: The dependent variable, indicating values of the
     variable of interest over time
     :type series_y: Pandas Series (of type float or int)
+    :param plt_save_pth: The path where the plot image will be saved
+    :type plt_save_pth: str
     :param plot_type: Determines the type of plot that is plotted.
     It can be either 'linear' (default) or 'log'. 'linear' plots
     series_y v/s series_x, 'log' plots the natural log of
@@ -44,19 +45,15 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plot_type: str = 
         plt.xlabel(series_x.name)
         plt.ylabel(series_y.name)
         plt.title("Time Series Visualization")
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        return buf
+        plt.savefig(plt_save_pth, format='png')
+        plt.close()
     elif plot_type == "log":
         plt.plot(series_x, np.log(series_y))
         plt.xlabel(series_x.name)
         plt.ylabel(f"{series_y.name} (log)")
         plt.title("Time Series Visualization (log scale)")
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        return buf
+        plt.savefig(plt_save_pth, format='png')
+        plt.close()
     else:
         raise ValueError(f"The 'plot_type' parameter can only be 'linear' or 'log'. {plot_type} is invalid.")
 
@@ -202,7 +199,7 @@ def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.Data
     return decompose_result
 
 
-def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, max_lag: int = 3):
+def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, plt_save_pth: str, max_lag: int = 3):
     """
     This function computes the lead and lag correlations between two
     given time-series data.\n
@@ -213,6 +210,8 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, m
     :param time_instances: The number of time instances to be considered
     for the correlation analysis.\n
     :type time_instances: int\n
+    :param plt_save_pth: The path where the plot image will be saved.\n
+    :type plt_save_pth: str\n
     :param max_lag: The maximum lag time to be considered for the
     correlation analysis.\n
     :type max_lag: int\n
@@ -226,7 +225,6 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, m
     y = y.iloc[-time_instances:]
 
     fig, ax = plt.subplots(2, 1, figsize=(10, 5))
-    buf = io.BytesIO()
 
     calmap.yearplot(x, ax=ax[0], cmap='YlGn',
                     fillcolor='grey', linewidth=2,
@@ -247,8 +245,8 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, m
 
     # Plot a colorbar legend
     plt.colorbar(scalar_mappable, ax=ax, label='Time-Series Values', location="right")
-    plt.savefig(buf, format='png')
-    buf.seek(0)
+    plt.savefig(plt_save_pth, format='png')
+    plt.close()
 
     x, y = x.to_frame(), y.to_frame()
     Is = range(-max_lag, max_lag)
@@ -267,4 +265,4 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, m
     lead_corr = correlations[[correlations['values'] >= 0] and correlations['Lags'] <= 0]  # With only lag time
     lag_corr = correlations[correlations['values'] >= 0]   # with lead and lag time both
 
-    return lead_corr, lag_corr, buf
+    return lead_corr, lag_corr

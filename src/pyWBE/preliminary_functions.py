@@ -41,6 +41,7 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str
     """
 
     if plot_type == "linear":
+        plt.figure(figsize=(15, 8))
         plt.plot(series_x, series_y)
         plt.xlabel(series_x.name)
         plt.ylabel(series_y.name)
@@ -48,6 +49,7 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str
         plt.savefig(plt_save_pth, format='png')
         plt.close()
     elif plot_type == "log":
+        plt.figure(figsize=(15, 8))
         plt.plot(series_x, np.log(series_y))
         plt.xlabel(series_x.name)
         plt.ylabel(f"{series_y.name} (log)")
@@ -224,7 +226,7 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     x = x.iloc[-time_instances:]
     y = y.iloc[-time_instances:]
 
-    fig, ax = plt.subplots(2, 1, figsize=(10, 5))
+    fig, ax = plt.subplots(2, 1, figsize=(15, 8))
 
     calmap.yearplot(x, ax=ax[0], cmap='YlGn',
                     fillcolor='grey', linewidth=2,

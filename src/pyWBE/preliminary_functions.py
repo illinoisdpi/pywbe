@@ -42,18 +42,22 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str
 
     if plot_type == "linear":
         plt.figure(figsize=(15, 8))
-        plt.plot(series_x, series_y)
-        plt.xlabel(series_x.name)
-        plt.ylabel(series_y.name)
-        plt.title("Time Series Visualization")
+        plt.grid(True)
+        plt.plot(series_x, series_y, "r")
+        plt.xlabel(series_x.name, fontsize=16)
+        plt.ylabel(series_y.name, fontsize=16)
+        plt.tick_params(axis='both', which='major', labelsize=14)
+        plt.title("Time Series Visualization", fontsize=20)
         plt.savefig(plt_save_pth, format='png')
         plt.close()
     elif plot_type == "log":
         plt.figure(figsize=(15, 8))
-        plt.plot(series_x, np.log(series_y))
-        plt.xlabel(series_x.name)
-        plt.ylabel(f"{series_y.name} (log)")
-        plt.title("Time Series Visualization (log scale)")
+        plt.grid(True)
+        plt.plot(series_x, np.log(series_y), "r")
+        plt.xlabel(series_x.name, fontsize=16)
+        plt.ylabel(f"{series_y.name} (log)", fontsize=16)
+        plt.tick_params(axis='both', which='major', labelsize=14)
+        plt.title("Time Series Visualization (log scale)", fontsize=20)
         plt.savefig(plt_save_pth, format='png')
         plt.close()
     else:
@@ -70,10 +74,12 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     :rtype: pd.Series
     """
 
+    week_dates = pd.date_range(start=conc_data.index.min(), end=conc_data.index.max(), freq='W')
     shifted_series = conc_data.copy(deep=True)
-    shifted_series.iloc[:-1] = conc_data.iloc[1:]
+    shifted_series = shifted_series[shifted_series.index.isin(week_dates)]
+    shifted_series.iloc[:-1] = shifted_series.iloc[1:]
 
-    perc_change = (shifted_series - conc_data) / conc_data * 100
+    perc_change = (shifted_series - conc_data[conc_data.index.isin(week_dates)]) / conc_data[conc_data.index.isin(week_dates)] * 100
 
     return perc_change.iloc[:-1]
 
@@ -240,7 +246,7 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     ax[1].set_title('Time Series 2')
 
     dates_str = f"{x.index[0].date()} to {x.index[-1].date()}"
-    fig.suptitle(f"Comparision of the two time series data \n from dates {dates_str}", x=0.45, fontsize=16)
+    fig.suptitle(f"Comparision of the two time series data \n from dates {dates_str}", x=0.45, fontsize=20)
     plt.tight_layout()
 
     cmap = plt.cm.YlGn

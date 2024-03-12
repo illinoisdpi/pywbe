@@ -115,7 +115,8 @@ def change_point_detection(data: pd.Series, model: str = "l2",
     :return: Returns a sorted list of breakpoints.\n
     :rtype: list\n
     """
-    algo = rpt.Pelt(model=model, min_size=min_size).fit(data)
+    data_np = data.to_numpy()
+    algo = rpt.Pelt(model=model, min_size=min_size).fit(data_np)
     result = algo.predict(pen=penalty)
     return result
 
@@ -167,6 +168,7 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
     elif window_duration > data_duration:
         raise DurationExceededError("""Window length is too long. Should not exceed given data's duration.""")
     else:
+        new_data = data.copy(deep=True)
         training_vals = data[data.index.isin(window)].to_numpy().reshape(-1, 1)
         X_train = training_vals[:-1]
         y_train = training_vals[1:]
@@ -178,9 +180,9 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
 
         time_diff = data.index[-1] - data.index[-2]
         next_index = data.index[-1] + time_diff
-        data[next_index] = one_time_step_pred[0]
+        new_data[next_index] = one_time_step_pred[0]
 
-        return data
+        return new_data
 
 
 def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.DataFrame:

@@ -1,11 +1,18 @@
 from weasyprint import HTML
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from pyWBE.preliminary_functions import (plot_time_series, analyze_trends,
                                          calculate_weekly_concentration_perc_change,
                                          change_point_detection, detect_seasonality,
                                          normalize_viral_load, forecast_single_instance,
                                          get_lead_lag_correlations)
+import ruptures as rpt
+
+
+def get_html_table(df: pd.DataFrame):
+    html_table = df.to_html(index=False, justify='center')
+    return html_table
 
 
 def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
@@ -28,6 +35,7 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
         body {{
             width: 6.5in; /* Set body width to 6.5 inches to account for margins */
             margin: 0 auto; /* Center the body within the page */
+            margin-bottom: 0.5in; /* Add a 0.5 inch margin to the bottom */
         }}
         /* Flex container for tables */
         .table-container {{
@@ -86,57 +94,30 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     <p>The plot below shows the comparison between the two-given time-series data:</p>
     <img src="{lead_lag_plot}" alt="Comparison between two time-series data">
 
+
     <p>These tables show the lead and lag correlations between the two time-series data:</p>
     <div class="table-container">
-        <table>
-            <tr>
-                <th>Offset</th>
-                <th>Lead Correlation</th>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>0.2</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>0.7</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>0.01</td>
-            </tr>
-        </table>
-
-        <table>
-            <tr>
-                <th>Offset</th>
-                <th>Lag Correlation</th>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>0.5</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>0.1</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>0.01</td>
-            </tr>
-        </table>
+        <div>
+            <p>Lead Correlations Table:</p>
+            {get_html_table(lead_table)}
+        </div>
+        <div>
+            <p>Lag Correlations Table:</p>
+            {get_html_table(lag_table)}
+        </div>
     </div>
     </body>
     </html>
     """
     HTML(string=html_content).write_pdf(pdf_path)
+    return html_content
 
 
 def plot_trends(data: pd.Series, trend_plot_pth: str):
     trends = analyze_trends(data)
     plt.figure(figsize=(15, 8))
-    plt.plot(x=data.index, y=data, label='Time-Series Data')
-    plt.plot(x=data.index, y=trends, label='Trend')
+    plt.plot(data.index, data, label='Time-Series Data')
+    plt.plot(data.index, trends, label='Trend')
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
@@ -147,7 +128,7 @@ def plot_trends(data: pd.Series, trend_plot_pth: str):
 def plot_conc_change(data: pd.Series, conc_change_plot_pth: str):
     conc_change = calculate_weekly_concentration_perc_change(data)
     plt.figure(figsize=(15, 8))
-    plt.plot(x=data.index, y=conc_change, label='Weekly Concentration % Change')
+    plt.plot(data.index[:-1], conc_change, label='Weekly Concentration % Change')
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
@@ -158,27 +139,27 @@ def plot_conc_change(data: pd.Series, conc_change_plot_pth: str):
 def plot_change_pt_detect(data: pd.Series, change_pt_detect_plot_pth: str,
                           model: str = "l2", min_size: int = 28, penalty: int = 1):
     change_points = change_point_detection(data, model, min_size, penalty)
-    plt.figure(figsize=(15, 8))
-    plt.plot(x=data.index, y=data, label='Time-Series Data')
-    plt.plot(x=change_points.index, y=change_points, label='Change Points')
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.legend()
+    _, ax = rpt.display(signal=data, true_chg_pts=[], computed_chg_pts=change_points, figsize=(15, 8))
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Set date format
+    plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=2))      # Set frequency of ticks to one month
+    ax[0].set_xlabel('Date')
+    ax[0].set_ylabel('Value')
     plt.savefig(change_pt_detect_plot_pth)
     plt.close()
 
 
 def plot_seasonality(data: pd.Series, seasonality_plot_pth: str, model_type: str = "additive"):
     seasonal = detect_seasonality(data, model_type)
-    fig, ax = plt.subplots(3, figsize=(15, 8))
-    ax[0].plot(x=data.index, y=seasonal.trend)
+    _, ax = plt.subplots(3, figsize=(15, 8))
+    ax[0].plot(data.index, seasonal.trend)
     ax[0].set_title('Trend')
-    ax[1].plot(x=data.index, y=seasonal.seasonal)
+    ax[1].plot(data.index, seasonal.seasonal)
     ax[1].set_title('Seasonal')
-    ax[2].scatter(x=data.index, y=seasonal.resid)
+    ax[2].scatter(data.index, seasonal.resid)
     ax[2].set_title('Residual')
     ax[2].set_xlabel('Date')
     plt.legend()
+    plt.tight_layout()
     plt.savefig(seasonality_plot_pth)
     plt.close()
 
@@ -186,7 +167,7 @@ def plot_seasonality(data: pd.Series, seasonality_plot_pth: str, model_type: str
 def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: str, normalize_by: str):
     normalized_data = normalize_viral_load(data, to_normalize, normalize_by)
     plt.figure(figsize=(15, 8))
-    plt.plot(x=data.index, y=normalized_data, label='Normalized Viral Load')
+    plt.plot(data.index, normalized_data, label='Normalized Viral Load')
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
@@ -197,8 +178,8 @@ def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: st
 def plot_forecast(data: pd.Series, forecast_plot_pth: str, window: pd.DatetimeIndex):
     forecast = forecast_single_instance(data, window)
     plt.figure(figsize=(15, 8))
-    plt.plot(x=forecast.index, y=forecast, label='Forecast')
-    plt.axvline(x=len(data), color='r', linestyle='--', label='Forecast Start')
+    plt.plot(forecast.index, forecast, label='Forecast')
+    plt.axvline(x=data.index[-2], color='r', linestyle='--', label='Forecast Start')
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
@@ -219,6 +200,9 @@ def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col:
     value_series = data_1[value_col]
     time_series = data_1[time_col]
     plot_time_series(time_series, value_series, time_series_plot_pth, plot_type)
+    lead_corr, lag_corr = get_lead_lag_correlations(value_series, data_2,
+                                                    lead_lag_time_instances, lead_lag_plot_pth,
+                                                    lead_lag_max_lag)
     plot_trends(value_series, trend_plot_pth)
     plot_conc_change(value_series, conc_change_plot_pth)
     plot_change_pt_detect(value_series, change_pt_detect_plot_pth, change_pt_model,
@@ -226,10 +210,8 @@ def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col:
     plot_seasonality(value_series, seasonality_plot_pth, seasonality_model)
     plot_normalize(data_1, normalize_plot_pth, value_col, normalize_using_col)
     plot_forecast(value_series, forecast_plot_pth, forecast_window)
-    lead_corr, lag_corr = get_lead_lag_correlations(value_series, data_2,
-                                                    lead_lag_time_instances, lead_lag_plot_pth,
-                                                    lead_lag_max_lag)
 
-    create_pdf_report(pdf_path, time_series_plot_pth, trend_plot_pth, conc_change_plot_pth,
-                      change_pt_detect_plot_pth, seasonality_plot_pth, normalize_plot_pth,
-                      forecast_plot_pth, lead_lag_plot_pth, lead_corr, lag_corr)
+    html_content = create_pdf_report(pdf_path, time_series_plot_pth, trend_plot_pth, conc_change_plot_pth,
+                                     change_pt_detect_plot_pth, seasonality_plot_pth, normalize_plot_pth,
+                                     forecast_plot_pth, lead_lag_plot_pth, lead_corr, lag_corr)
+    return html_content

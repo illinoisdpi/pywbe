@@ -1,4 +1,3 @@
-from weasyprint import HTML
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -107,7 +106,7 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     <p>The following plot shows how the given time-series data changes over time:</p>
     <img src="{time_series_plot}" alt="Time-series data over time">
 
-    <p>The following plots show the rate of change of the given values as a percentage change and the overall trend of the data:</p>
+    <p>The following plots show the rate of change of the given values as a weekly percentage change and the overall trend of the data:</p>
     <!--
     <div class="image-container">
         <img src="{conc_change_plot}" alt="Percentage change">
@@ -147,7 +146,6 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     </body>
     </html>
     """
-    HTML(string=html_content).write_pdf(pdf_path)
     return html_content
 
 
@@ -284,12 +282,29 @@ def plot_forecast(data: pd.Series, forecast_plot_pth: str, window: pd.DatetimeIn
     :type window: pd.DatetimeIndex. \n
     """
     forecast = forecast_single_instance(data, window)
-    plt.figure(figsize=(15, 8))
-    plt.plot(forecast.index, forecast, label='Forecast')
-    plt.axvline(x=data.index[-2], color='r', linestyle='--', label='Forecast Start')
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.legend()
+    window_length = len(window)
+    fig, ax = plt.subplots(figsize=(20, 10))
+    ax.set_ylim([forecast.min()-0.5*abs(forecast.min()), forecast.max()+0.5*abs(forecast.max())])
+    ax.plot(forecast.index, forecast, label='Time-Series')
+    ax.axvspan(window[0], window[-1], alpha=0.3, color='yellow', label='Forecast Window')
+    ax.axvline(x=data.index[-1], color='r', linestyle='--', label='Forecast Start')
+    inset_ax = plt.axes([0.7, 0.7, 0.25, 0.25])
+    inset_ax.plot(forecast.index[-window_length:], forecast.iloc[-window_length:])
+    inset_ax.axvline(x=data.index[-1], color='r', linestyle='--', label='Forecast Start')
+    inset_ax.set_xticks(forecast.index.date[-window_length::3])
+    inset_ax.set_xticklabels(forecast.index.date[-window_length::3], rotation=45)
+    inset_ax.set_title('Zoomed-In Forecast')
+    ax.set_xlabel('Date', fontsize=20)
+    ax.set_ylabel('Value', fontsize=20)
+    ax.legend(fontsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    ax.set_title("Single-Step Forecast of Time-Series Data", fontsize=24)
+    # plt.figure(figsize=(15, 8))
+    # plt.plot(forecast.index, forecast, label='Forecast')
+    # plt.axvline(x=data.index[-2], color='r', linestyle='--', label='Forecast Start')
+    # plt.xlabel('Date')
+    # plt.ylabel('Value')
+    # plt.legend()
     plt.savefig(forecast_plot_pth)
     plt.close()
 

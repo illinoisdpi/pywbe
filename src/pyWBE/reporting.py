@@ -7,6 +7,7 @@ from pyWBE.preliminary_functions import (plot_time_series, analyze_trends,
                                          normalize_viral_load, forecast_single_instance,
                                          get_lead_lag_correlations)
 import ruptures as rpt
+import pypandoc
 
 
 def get_html_table(df: pd.DataFrame):
@@ -20,15 +21,15 @@ def get_html_table(df: pd.DataFrame):
     return html_table
 
 
-def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
+def create_doc_report(doc_path: str, time_series_plot: str, trend_plot: str,
                       conc_change_plot: str, change_pt_detect_plot: str,
                       seasonality_plot: str, normalize_plot: str,
                       forecast_plot: str, lead_lag_plot: str,
                       lead_table: pd.DataFrame, lag_table: pd.DataFrame):
     """
-    This function takes the paths to the plots and tables and creates a PDF report. \n
-    :param pdf_path: Path to save the PDF report. \n
-    :type pdf_path: str. \n
+    This function takes the paths to the plots and tables and creates a DOCX report. \n
+    :param doc_path: Path to save the DOCX report. \n
+    :type doc_path: str. \n
     :param time_series_plot: Path to the time-series plot. \n
     :type time_series_plot: str. \n
     :param trend_plot: Path to the trend plot. \n
@@ -49,8 +50,6 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     :type lead_table: pd.DataFrame. \n
     :param lag_table: Lag correlations table. \n
     :type lag_table: pd.DataFrame. \n
-    :return: HTML of the generated report. \n
-    :rtype: str. \n
     """
 
     html_content = f"""
@@ -59,7 +58,6 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report</title>
     <style>
         @page {{
             size: letter; /* Set the page size to letter */
@@ -99,14 +97,22 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
             flex: 1; /* Allows the image to grow and fill the container */
             max-width: calc(50% - 10px); /* Adjusts max-width to account for gap, preventing overflow */
         }}
+        .text-justify {{
+            text-align: justify; /* Justify text */
+        }}
     </style>
     </head>
     <body>
-    <h1 style='text-align: center;'>Report</h1>
+    <h1 style='text-align: center;'>Wastewater-Based Epidemiology/COVID-19 Report</h1>
+    <p class="text-justify">This report provides a general statistical analysis of the given time-series data, such as trend and seasonality analysis,
+    change point analysis, and single step ML-based forecasting.
+    </p>
+    <h2 style='text-align: center;'>Time-Series Visualization</h2>
     <p>The following plot shows how the given time-series data changes over time:</p>
     <img src="{time_series_plot}" alt="Time-series data over time">
 
-    <p>The following plots show the rate of change of the given values as a weekly percentage change and the overall trend of the data:</p>
+    <h2 style='text-align: center;'>Weekly Percentage Concentration Change</h2>
+    <p>The following plot shows the rate of change of the given values as a weekly percentage change:</p>
     <!--
     <div class="image-container">
         <img src="{conc_change_plot}" alt="Percentage change">
@@ -114,25 +120,52 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     </div>
     -->
     <img src="{conc_change_plot}" alt="Percentage change">
+    <h2 style='text-align: center;'>Trend Analysis</h2>
+    <p>The following plot shows the linear trend followed by the given time-series data:</p>
     <img src="{trend_plot}" alt="Overall trend">
 
-    <p>The following plot shows the change points in the data i.e., the places where the behavior of the time-series changes:</p>
+    <h2 style='text-align: center;'>Change Point Detection</h2>
+    <p class="text-justify">The following plot shows the change points in the data i.e., the places where the behavior of the time-series changes.
+    Change point detection is a statistical technique used to identify points in a time series where the statistical properties
+    of the data significantly change. We are using the Pelt algorithm that finds the optimal segmentation by minimizing a cost
+    function, such as L1 loss, L2 loss, or the Radial Basis Function (RBF) loss.</p>
     <img src="{change_pt_detect_plot}" alt="Change points in the data">
 
+    <h2 style='text-align: center;'>Seasonality Analysis</h2>
     <p>The given time-series data has the following seasonal components:</p>
+    <p class="text-justify">
+    <b> Trend Component: </b> The trend component captures the long-term behavior or direction of the time series, ignoring short-term fluctuations
+    and seasonal variations. It represents the underlying growth or decline in the data over time, providing insights into the overall trajectory of
+    the series. Identifying the trend component is essential for understanding the underlying dynamics and making predictions about future behavior.
+    </p>
+    <p class="text-justify">
+    <b> Seasonal Component: </b> The seasonal component represents the recurring patterns or cycles within the time series that occur at fixed
+    intervals, such as daily, weekly, or yearly fluctuations. These patterns often reflect seasonal variations in the data.
+    </p>
+    <p class="text-justify">
+    <b> Residual Component: </b> The residual component, also known as the irregular or noise component, represents the random fluctuations or
+    variability in the time series that cannot be explained by the seasonal and trend components. It captures the deviations of the observed data
+    from the fitted seasonal and trend patterns, often containing information about random shocks, measurement errors, or other unmodeled factors.
+    </p>
     <img src="{seasonality_plot}" alt="Seasonal components">
 
-    <p>And this plot shows the normalized values of the time-series data based on the values in the indicated column:</p>
+    <h2 style='text-align: center;'>Normalized Time-Series Plot</h2>
+    <p class="text-justify"> And this plot shows the normalized values of the time-series data based on the mean of the values in the indicated column:</p>
     <img src="{normalize_plot}" alt="Normalized values of the time-series">
 
-    <p>The single-step forecast from the time-series data looks like this:</p>
+    <h2 style='text-align: center;'>Single-Step Time-Series Forecast</h2>
+    <p class="text-justify"> Currently, we are using a linear regression model to predict the value of the next time step, given the value at the
+    current time step. The single-step forecast from the time-series data looks like this:</p>
     <img src="{forecast_plot}" alt="Single-step forecast">
 
-    <p>The plot below shows the comparison between the two-given time-series data:</p>
+    <h2 style='text-align: center;'>Lead-Lag Correlation Analysis</h2>
+    <p class="text-justify">The plot below shows the comparison between the two-given time-series data:</p>
     <img src="{lead_lag_plot}" alt="Comparison between two time-series data">
 
 
-    <p>These tables show the lead and lag correlations between the two time-series data:</p>
+    <p>These tables show the lead and lag correlations between the two time-series data. The numerical value in the lead/lag column indicates the
+    time steps the second times-series data was shifted by and the values column shows the Spearman correlation value for the corresponding shift.
+    </p>
     <div class="table-container">
         <div>
             <p>Lead Correlations Table:</p>
@@ -146,7 +179,10 @@ def create_pdf_report(pdf_path: str, time_series_plot: str, trend_plot: str,
     </body>
     </html>
     """
-    return html_content
+    with open(f'{doc_path[:-5]}.html', 'w') as f:
+        f.write(html_content)
+    pypandoc.convert_file(f'{doc_path[:-5]}.html', 'docx', outputfile=doc_path)
+    return None
 
 
 def plot_trends(data: pd.Series, trend_plot_pth: str):
@@ -162,8 +198,8 @@ def plot_trends(data: pd.Series, trend_plot_pth: str):
     plt.plot(data.index, data, "--g", label='Time-Series Data')
     plt.plot(data.index, trends, "r", label='Trend')
     plt.tick_params(axis='both', which='major', labelsize=14)
-    plt.xlabel('Date', fontsize=16)
-    plt.ylabel('Value', fontsize=16)
+    plt.xlabel('Dates', fontsize=16)
+    plt.ylabel(data.name, fontsize=16)
     plt.title("Trend of Time-Series Data", fontsize=20)
     plt.legend(fontsize=14)
     plt.savefig(trend_plot_pth)
@@ -181,8 +217,8 @@ def plot_conc_change(data: pd.Series, conc_change_plot_pth: str):
     conc_change = calculate_weekly_concentration_perc_change(data)
     plt.figure(figsize=(15, 8))
     plt.plot(conc_change.index, conc_change, "-ob", label='Weekly Concentration % Change')
-    plt.xlabel('Date', fontsize=16)
-    plt.ylabel('Value', fontsize=16)
+    plt.xlabel('Dates', fontsize=16)
+    plt.ylabel(data.name, fontsize=16)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.title("Weekly Percentage Concentration Change in Data", fontsize=20)
     plt.legend(fontsize=14)
@@ -211,8 +247,8 @@ def plot_change_pt_detect(data: pd.Series, change_pt_detect_plot_pth: str,
     ax[0].xaxis.set_major_locator(MaxNLocator(nbins=10))  # Set maximum number of xticks to 10
     ax[0].set_xticks(range(len(data.index))[::len(data.index)//10])  # Set xticks to every 10th index
     ax[0].set_xticklabels(data.index.date[::len(data.index)//10])  # Set xtick labels to date, skipping some to avoid crowding
-    ax[0].set_xlabel('Date', fontsize=16)
-    ax[0].set_ylabel('Value', fontsize=16)
+    ax[0].set_xlabel('Dates', fontsize=16)
+    ax[0].set_ylabel(data.name, fontsize=16)
     plt.title("Change Points in Time-Series Data", fontsize=20)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tight_layout()
@@ -262,8 +298,8 @@ def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: st
     plt.figure(figsize=(15, 8))
     plt.grid(True)
     plt.plot(data.index, normalized_data, "r", label='Normalized Viral Load')
-    plt.xlabel('Date', fontsize=16)
-    plt.ylabel('Value', fontsize=16)
+    plt.xlabel('Dates', fontsize=16)
+    plt.ylabel(to_normalize, fontsize=16)
     plt.title("Normalized Values of the Time-Series Data", fontsize=20)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.legend(fontsize=14)
@@ -294,8 +330,8 @@ def plot_forecast(data: pd.Series, forecast_plot_pth: str, window: pd.DatetimeIn
     inset_ax.set_xticks(forecast.index.date[-window_length::3])
     inset_ax.set_xticklabels(forecast.index.date[-window_length::3], rotation=45)
     inset_ax.set_title('Zoomed-In Forecast')
-    ax.set_xlabel('Date', fontsize=20)
-    ax.set_ylabel('Value', fontsize=20)
+    ax.set_xlabel('Dates', fontsize=20)
+    ax.set_ylabel(data.name, fontsize=20)
     ax.legend(fontsize=14)
     ax.tick_params(axis='both', which='major', labelsize=18)
     ax.set_title("Single-Step Forecast of Time-Series Data", fontsize=24)
@@ -383,7 +419,7 @@ def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col:
     plot_normalize(data_1, normalize_plot_pth, value_col, normalize_using_col)
     plot_forecast(value_series, forecast_plot_pth, forecast_window)
 
-    html_content = create_pdf_report(pdf_path, time_series_plot_pth, trend_plot_pth, conc_change_plot_pth,
+    html_content = create_doc_report(pdf_path, time_series_plot_pth, trend_plot_pth, conc_change_plot_pth,
                                      change_pt_detect_plot_pth, seasonality_plot_pth, normalize_plot_pth,
                                      forecast_plot_pth, lead_lag_plot_pth, lead_corr, lag_corr)
     return html_content

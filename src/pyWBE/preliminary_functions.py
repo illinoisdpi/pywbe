@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.seasonal import seasonal_decompose
 import ruptures as rpt
-import calmap
-import matplotlib.colors as mcolors
 
 
 def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str, plot_type: str = "linear"):
@@ -234,29 +232,59 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     x = x.iloc[-time_instances:]
     y = y.iloc[-time_instances:]
 
-    fig, ax = plt.subplots(2, 1, figsize=(15, 8))
+    data_matrix = np.array([x, y])
+    fig_size = data_matrix.shape[1] / 2
+    fig, ax = plt.subplots(figsize=(fig_size, 3))
+    heatmap = ax.imshow(data_matrix, cmap='viridis', aspect='equal')
 
-    calmap.yearplot(x, ax=ax[0], cmap='YlGn',
-                    fillcolor='grey', linewidth=2,
-                    daylabels='MTWTFSS', dayticks=[0, 2, 4, 6])
-    ax[0].set_title('Time Series 1')
-    calmap.yearplot(y, ax=ax[1], cmap='YlGn',
-                    fillcolor='grey', linewidth=2,
-                    daylabels='MTWTFSS', dayticks=[0, 2, 4, 6])
-    ax[1].set_title('Time Series 2')
+    _ = plt.colorbar(heatmap)
 
-    dates_str = f"{x.index[0].date()} to {x.index[-1].date()}"
-    fig.suptitle(f"Comparision of the two time series data \n from dates {dates_str}", x=0.45, fontsize=20)
+    # Adding grid lines to separate the squares
+    ax.set_xticks(np.arange(-.5, data_matrix.shape[1], 1), minor=True)
+    ax.set_yticks(np.arange(-.5, 2, 1), minor=True)
+    ax.grid(which="minor", color="k", linestyle='-', linewidth=2)
+    ax.tick_params(which="minor", size=0, labelsize=14)
+
+    # Setting the labels
+    ax.set_xticks(range(len(x.index))[::len(x.index)//10])
+    ax.set_xticklabels(x.index.date[::len(x.index)//10], rotation=45)
+    ax.set_xlabel("Dates", fontsize=16)
+    ax.set_ylabel(x.name, fontsize=16)
+    ax.set_yticks(np.arange(data_matrix.shape[0]))
+    ax.set_yticklabels(['Series 1', 'Series 2'])
+
+    # Turn spines off
+    for edge, spine in ax.spines.items():
+        spine.set_visible(False)
+
+    plt.title('Heatmap Comparison of Two Time-Series Data', fontsize=20)
     plt.tight_layout()
-
-    cmap = plt.cm.YlGn
-    norm = mcolors.Normalize(vmin=min(x.min(), y.min()), vmax=max(x.max(), y.max()))  # Adjust the range if needed
-    scalar_mappable = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
-
-    # Plot a colorbar legend
-    plt.colorbar(scalar_mappable, ax=ax, label='Time-Series Values', location="right")
     plt.savefig(plt_save_pth, format='png')
     plt.close()
+
+    # fig, ax = plt.subplots(2, 1, figsize=(15, 8))
+
+    # calmap.yearplot(x, ax=ax[0], cmap='YlGn',
+    #                 fillcolor='grey', linewidth=2,
+    #                 daylabels='MTWTFSS', dayticks=[0, 2, 4, 6])
+    # ax[0].set_title('Time Series 1')
+    # calmap.yearplot(y, ax=ax[1], cmap='YlGn',
+    #                 fillcolor='grey', linewidth=2,
+    #                 daylabels='MTWTFSS', dayticks=[0, 2, 4, 6])
+    # ax[1].set_title('Time Series 2')
+
+    # dates_str = f"{x.index[0].date()} to {x.index[-1].date()}"
+    # fig.suptitle(f"Comparision of the two time series data \n from dates {dates_str}", x=0.45, fontsize=20)
+    # plt.tight_layout()
+
+    # cmap = plt.cm.YlGn
+    # norm = mcolors.Normalize(vmin=min(x.min(), y.min()), vmax=max(x.max(), y.max()))  # Adjust the range if needed
+    # scalar_mappable = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
+
+    # # Plot a colorbar legend
+    # plt.colorbar(scalar_mappable, ax=ax, label='Time-Series Values', location="right")
+    # plt.savefig(plt_save_pth, format='png')
+    # plt.close()
 
     x, y = x.to_frame(), y.to_frame()
     Is = range(-max_lag, max_lag)

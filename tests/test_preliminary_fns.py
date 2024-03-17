@@ -7,16 +7,16 @@ import ruptures as rpt
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    (pd.Series(np.ones(10), index=pd.date_range(start='01/01/2024', periods=10, freq='W')),
-     pd.Series(np.zeros(9), index=pd.date_range(start='01/01/2024', periods=9, freq='W'))),
-    (pd.Series([1, 2, 4, 8, 16, 32, 64], index=pd.date_range(start='01/01/2024', periods=7, freq='W')),
-     pd.Series(np.ones(6)*100, index=pd.date_range(start='01/01/2024', periods=6, freq='W'))),
-    (pd.Series([2, 4, 7, 10.5, 13.125], index=pd.date_range(start='01/01/2024', periods=5, freq='W')),
-     pd.Series([100.0, 75.0, 50.0, 25.0], index=pd.date_range(start='01/01/2024', periods=4, freq='W'))),
-    (pd.Series(np.arange(4), index=pd.date_range(start='01/01/2024', periods=4, freq='W')),
-     pd.Series([np.inf, 100, 50], index=pd.date_range(start='01/01/2024', periods=3, freq='W'))),
-    (pd.Series(np.zeros(5), index=pd.date_range(start='01/01/2024', periods=5, freq='W')),
-     pd.Series(np.ones(4) * np.nan, index=pd.date_range(start='01/01/2024', periods=4, freq='W')))
+    (pd.Series(np.ones(10), index=pd.date_range(start='01/01/2024', periods=10, freq='7D')),
+     pd.Series(np.zeros(9), index=pd.date_range(start='01/01/2024', periods=9, freq='7D'))),
+    (pd.Series([1, 2, 4, 8, 16, 32, 64], index=pd.date_range(start='01/01/2024', periods=7, freq='7D')),
+     pd.Series(np.ones(6)*100, index=pd.date_range(start='01/01/2024', periods=6, freq='7D'))),
+    (pd.Series([2, 4, 7, 10.5, 13.125], index=pd.date_range(start='01/01/2024', periods=5, freq='7D')),
+     pd.Series([100.0, 75.0, 50.0, 25.0], index=pd.date_range(start='01/01/2024', periods=4, freq='7D'))),
+    (pd.Series(np.arange(4), index=pd.date_range(start='01/01/2024', periods=4, freq='7D')),
+     pd.Series([np.inf, 100, 50], index=pd.date_range(start='01/01/2024', periods=3, freq='7D'))),
+    (pd.Series(np.zeros(5), index=pd.date_range(start='01/01/2024', periods=5, freq='7D')),
+     pd.Series(np.ones(4) * np.nan, index=pd.date_range(start='01/01/2024', periods=4, freq='7D')))
 ])
 def test_perc_conc_change(test_input, expected):
     assert preliminary_functions.calculate_weekly_concentration_perc_change(test_input).equals(expected)

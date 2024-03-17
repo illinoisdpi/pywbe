@@ -274,7 +274,7 @@ def plot_seasonality(data: pd.Series, seasonality_plot_pth: str, model_type: str
     ax[1].set_title('Seasonal', fontsize=20)
     ax[2].scatter(data.index, seasonal.resid, color="g")
     ax[2].set_title('Residual', fontsize=20)
-    ax[2].set_xlabel('Date', fontsize=16)
+    ax[2].set_xlabel('Dates', fontsize=16)
     plt.legend(fontsize=14)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tight_layout()
@@ -345,7 +345,7 @@ def plot_forecast(data: pd.Series, forecast_plot_pth: str, window: pd.DatetimeIn
     plt.close()
 
 
-def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col: str, value_col: str,
+def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, value_col: str,
                               normalize_using_col: str, forecast_window: pd.DatetimeIndex,
                               lead_lag_time_instances: int, lead_lag_max_lag: int,
                               pdf_path: str, time_series_plot_pth: str, trend_plot_pth: str,
@@ -361,8 +361,6 @@ def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col:
     :type data_1: pd.DataFrame. \n
     :param data_2: Secondary time-series data to be used for correlation analysis. \n
     :type data_2: pd.Series. \n
-    :param time_col: Column name indicating dates/time in data_1. \n
-    :type time_col: str. \n
     :param value_col: Column name indicating values of interest in data_1. \n
     :type value_col: str. \n
     :param normalize_using_col: Column name to normalize "values" in data_1 by. \n
@@ -406,7 +404,7 @@ def generate_report_from_data(data_1: pd.DataFrame, data_2: pd.Series, time_col:
     :rtype: str. \n
     """
     value_series = data_1[value_col]
-    time_series = data_1[time_col]
+    time_series = data_1.index
     plot_time_series(time_series, value_series, time_series_plot_pth, plot_type)
     lead_corr, lag_corr = get_lead_lag_correlations(value_series, data_2,
                                                     lead_lag_time_instances, lead_lag_plot_pth,

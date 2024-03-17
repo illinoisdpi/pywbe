@@ -66,7 +66,7 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
     :rtype: pd.Series\n
     """
 
-    week_dates = pd.date_range(start=conc_data.index.min(), end=conc_data.index.max(), freq='W')
+    week_dates = pd.date_range(start=conc_data.index.min(), end=conc_data.index.max(), freq='7D')
     shifted_series = conc_data.copy(deep=True)
     shifted_series = shifted_series[shifted_series.index.isin(week_dates)]
     shifted_series.iloc[:-1] = shifted_series.iloc[1:]

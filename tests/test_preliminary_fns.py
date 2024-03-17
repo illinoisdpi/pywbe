@@ -7,11 +7,16 @@ import ruptures as rpt
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    (pd.Series(np.ones(10)), pd.Series(np.zeros(9))),
-    (pd.Series([1, 2, 4, 8, 16, 32, 64]), pd.Series(np.ones(6)*100)),
-    (pd.Series([2, 4, 7, 10.5, 13.125]), pd.Series([100.0, 75.0, 50.0, 25.0])),
-    (pd.Series(np.arange(4)), pd.Series([np.inf, 100, 50])),
-    (pd.Series(np.zeros(5)), pd.Series(np.ones(4) * np.nan))
+    (pd.Series(np.ones(10), index=pd.date_range(start='01/01/2024', periods=10, freq='W')),
+     pd.Series(np.zeros(9), index=pd.date_range(start='01/01/2024', periods=9, freq='W'))),
+    (pd.Series([1, 2, 4, 8, 16, 32, 64], index=pd.date_range(start='01/01/2024', periods=7, freq='W')),
+     pd.Series(np.ones(6)*100, index=pd.date_range(start='01/01/2024', periods=6, freq='W'))),
+    (pd.Series([2, 4, 7, 10.5, 13.125], index=pd.date_range(start='01/01/2024', periods=5, freq='W')),
+     pd.Series([100.0, 75.0, 50.0, 25.0], index=pd.date_range(start='01/01/2024', periods=4, freq='W'))),
+    (pd.Series(np.arange(4), index=pd.date_range(start='01/01/2024', periods=4, freq='W')),
+     pd.Series([np.inf, 100, 50], index=pd.date_range(start='01/01/2024', periods=3, freq='W'))),
+    (pd.Series(np.zeros(5), index=pd.date_range(start='01/01/2024', periods=5, freq='W')),
+     pd.Series(np.ones(4) * np.nan, index=pd.date_range(start='01/01/2024', periods=4, freq='W')))
 ])
 def test_perc_conc_change(test_input, expected):
     assert preliminary_functions.calculate_weekly_concentration_perc_change(test_input).equals(expected)
@@ -72,7 +77,7 @@ def test_normalize_viral_load():
     ("rbf")
 ])
 def test_change_point_detection(model):
-    n_samples, dim, sigma = 1000, 3, 4
+    n_samples, dim, sigma = 1000, 1, 4
     n_bkps = 4  # number of breakpoints
     penalty = 10
     signal, bkps = rpt.pw_constant(n_samples, dim, n_bkps, noise_std=sigma)
@@ -80,5 +85,6 @@ def test_change_point_detection(model):
     # detection
     algo = rpt.Pelt(model=model).fit(signal)
     result = algo.predict(pen=penalty)
+    signal = pd.Series(signal.flatten(), index=pd.date_range(start="02/06/2024", periods=len(signal.flatten()), freq='D'))
 
     assert preliminary_functions.change_point_detection(signal, model, 2, penalty) == result

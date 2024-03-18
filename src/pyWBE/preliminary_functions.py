@@ -21,21 +21,16 @@ import ruptures as rpt
 
 def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str, plot_type: str = "linear"):
     """
-    This function plots the given time-series data for easy visualization.
-
-    :param series_x: The independent variable, usually indicating time
-    steps in arbitrary or specific units
-    :type series_x: Pandas Series
-    :param series_y: The dependent variable, indicating values of the
-    variable of interest over time
-    :type series_y: Pandas Series (of type float or int)
-    :param plt_save_pth: The path where the plot image will be saved
-    :type plt_save_pth: str
-    :param plot_type: Determines the type of plot that is plotted.
-    It can be either 'linear' (default) or 'log'. 'linear' plots
-    series_y v/s series_x, 'log' plots the natural log of
-    series_y v/s series_x
-    :type plot_type: str
+    This function plots the given time-series data for easy visualization.\n
+    :param series_x: The independent variable, usually indicating time steps in arbitrary or specific units.\n
+    :type series_x: Pandas Series\n
+    :param series_y: The dependent variable, indicating values of the variable of interest over time.\n
+    :type series_y: Pandas Series (of type float or int)\n
+    :param plt_save_pth: The path where the plot image will be saved.\n
+    :type plt_save_pth: str\n
+    :param plot_type: Can be either 'linear' (default) or 'log'. 'linear' plots series_y v/s series_x,
+        'log' plots the natural log of series_y v/s series_x.\n
+    :type plot_type: str\n
     """
 
     if plot_type == "linear":
@@ -64,15 +59,14 @@ def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str
 
 def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Series:
     """
-    This function computes the weekly percentage change in concentration levels
-    in the given time-series data.
-    :param conc_data: The concentration data, assumed to have a periodicity of 1 week
-    :type conc_data: Pandas Series (of type float or int)
-    :return: Returns the weekly percentage change in concentration levels
-    :rtype: pd.Series
+    This function computes the weekly percentage change in concentration levels in the given time-series data.\n
+    :param conc_data: The concentration data, assumed to have a periodicity of 1 week.\n
+    :type conc_data: Pandas Series (of type float or int)\n
+    :return: Returns the weekly percentage change in concentration levels.\n
+    :rtype: pd.Series\n
     """
 
-    week_dates = pd.date_range(start=conc_data.index.min(), end=conc_data.index.max(), freq='W')
+    week_dates = pd.date_range(start=conc_data.index.min(), end=conc_data.index.max(), freq='7D')
     shifted_series = conc_data.copy(deep=True)
     shifted_series = shifted_series[shifted_series.index.isin(week_dates)]
     shifted_series.iloc[:-1] = shifted_series.iloc[1:]
@@ -85,12 +79,10 @@ def calculate_weekly_concentration_perc_change(conc_data: pd.Series) -> pd.Serie
 def analyze_trends(data: pd.Series) -> list[float]:
     """
     This function computes the trend line for the given data.\n
-    :param data: The time-series data (assumed to be sorted
-    in an increasing order of time).\n
+    :param data: The time-series data (assumed to be sorted in an increasing order of time).\n
     :type data: pd.Series\n
-    :return: Returns the trend line values which can be plotted
-    as date v/s returned trend line values.\n
-    :rtype: list
+    :return: Returns the trend line values which can be plotted as date v/s returned trend line values.\n
+    :rtype: list\n
     """
     z = np.polyfit(range(len(data)), data, 1)
     p = np.poly1d(z)
@@ -104,17 +96,13 @@ def change_point_detection(data: pd.Series, model: str = "l2",
     This function uses the PELT (Pruned Exact Linear Time) function
     of the Ruptures library to analyze the given time-series data
     for change point detection.\n
-    :param data: A Pandas Series containing the time-series data
-    whose change points need to be detected.\n
+    :param data: A Pandas Series containing the time-series data whose change points need to be detected.\n
     :type data: pd.Series\n
-    :param model: The model used by PELT to perform the analysis.
-    Allowed types include "l1", "l2", and "rbf".\n
+    :param model: The model used by PELT to perform the analysis. Allowed types include "l1", "l2", and "rbf".\n
     :type model: str\n
-    :param min_size: The minimum separation (time steps) between
-    two consecutive change points detected by the model.\n
+    :param min_size: The minimum separation (time steps) between two consecutive change points detected by the model.\n
     :type min_size: int\n
-    :param penalty: The penalty value used during prediction of
-    change points.\n
+    :param penalty: The penalty value used during prediction of change points.\n
     :type penalty: int\n
     :return: Returns a sorted list of breakpoints.\n
     :rtype: list\n
@@ -151,16 +139,13 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
     a single time-step into the future using a Linear Regression
     model trained on the data specified by the parameter "window_length".\n
     :param data: A Pandas Series, assumed to have dates as its indices,
-    containing the time-series data whose value needs to be predicted
-    in the future.\n
+        containing the time-series data whose value needs to be predicted in the future.\n
     :type data: pd.Series\n
-    :param window: A Pandas DateTimeIndex containing date range for
-    the "data" that must be used to train the Linear Regression model.
-    Minimum length must be 1 week and maximum length can be the entire
-    date range of the "data".\n
+    :param window: A Pandas DateTimeIndex containing date range for the "data" that must be
+        used to train the Linear Regression model. Minimum length must be 1 week and maximum
+        length can be the entire date range of the "data".\n
     :type window: pd.DateTimeIndex\n
-    :return: Returns the original "data" with the next time-step
-    prediction appended to it.\n
+    :return: Returns the original "data" with the next time-step prediction appended to it.\n
     :rtype: pd.Series\n
     """
     one_week = pd.Timedelta(days=7)
@@ -192,15 +177,14 @@ def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Se
 def detect_seasonality(data: pd.Series, model_type: str = "additive") -> pd.DataFrame:
     """
     This function analyzes a given time-series data for seasonality.\n
-    :param data: A Pandas Series, assumed to have dates as its indices
-    with the corresponding values of the time-series data.\n
+    :param data: A Pandas Series, assumed to have dates as its indices with the corresponding
+        values of the time-series data.\n
     :type data: pd.Series\n
-    :param model_type: Can be "additive" or "multiplicative", determines
-    the type of seasonality model assumed for the data.\n
+    :param model_type: Can be "additive" or "multiplicative", determines the type of seasonality
+        model assumed for the data.\n
     :type model_type: str\n
-    :return: Returns a Pandas DataFrame that contain the Trend, Seasonal,
-    and Residual components computed using the given model type. Can be
-    plotted using the "plot" method of Pandas DataFrame class.\n
+    :return: Returns a Pandas DataFrame that contain the Trend, Seasonal, and Residual components
+        computed using the given model type. Can be plotted using the "plot" method of Pandas DataFrame class.\n
     :rtype: pd.DataFrame\n
     """
     decompose_result = seasonal_decompose(data, model=model_type)
@@ -215,17 +199,14 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     :type x: pd.Series\n
     :param y: The second time-series data.\n
     :type y: pd.Series\n
-    :param time_instances: The number of time instances to be considered
-    for the correlation analysis.\n
+    :param time_instances: The number of time instances to be considered for the correlation analysis.\n
     :type time_instances: int\n
     :param plt_save_pth: The path where the plot image will be saved.\n
     :type plt_save_pth: str\n
-    :param max_lag: The maximum lag time to be considered for the
-    correlation analysis.\n
+    :param max_lag: The maximum lag time to be considered for the correlation analysis.\n
     :type max_lag: int\n
-    :return: Returns the lead and lag correlations between the
-    given time-series data and the buffer where the time-series
-    comparision is stored.\n
+    :return: Returns the lead and lag correlations between the given time-series data and the buffer
+        where the time-series comparision is stored.\n
     :rtype: Tuple\n
     """
 

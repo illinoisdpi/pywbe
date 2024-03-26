@@ -229,8 +229,8 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     # Setting the labels
     ax.set_xticks(range(len(x.index))[::len(x.index)//10])
     ax.set_xticklabels(x.index.date[::len(x.index)//10], rotation=45)
-    ax.set_xlabel("Dates", fontsize=16)
-    ax.set_ylabel(x.name, fontsize=16)
+    ax.set_xlabel("Dates", fontsize=12)
+    ax.set_ylabel(x.name, fontsize=12)
     ax.set_yticks(np.arange(data_matrix.shape[0]))
     ax.set_yticklabels(['Series 1', 'Series 2'])
 
@@ -238,7 +238,7 @@ def get_lead_lag_correlations(x: pd.Series, y: pd.Series, time_instances: int, p
     for edge, spine in ax.spines.items():
         spine.set_visible(False)
 
-    plt.title('Heatmap Comparison of Two Time-Series Data', fontsize=20)
+    plt.title('Heatmap Comparison of Two Time-Series Data', fontsize=16)
     plt.tight_layout()
     plt.savefig(plt_save_pth, format='png')
     plt.close()

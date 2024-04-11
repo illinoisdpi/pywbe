@@ -1,0 +1,217 @@
+:py:mod:`pyWBE.preliminary_functions`
+=====================================
+
+.. py:module:: pyWBE.preliminary_functions
+
+.. autoapi-nested-parse::
+
+   =====================
+   Preliminary Functions
+   =====================
+
+   Contains preliminary functions used to aid data analysis.
+
+   Note: Add type-hints and docstrings to functions as they are implemented.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyWBE.preliminary_functions.plot_time_series
+   pyWBE.preliminary_functions.calculate_weekly_concentration_perc_change
+   pyWBE.preliminary_functions.analyze_trends
+   pyWBE.preliminary_functions.change_point_detection
+   pyWBE.preliminary_functions.normalize_viral_load
+   pyWBE.preliminary_functions.forecast_single_instance
+   pyWBE.preliminary_functions.detect_seasonality
+   pyWBE.preliminary_functions.get_lead_lag_correlations
+
+
+
+.. py:function:: plot_time_series(series_x: pandas.Series, series_y: pandas.Series, plt_save_pth: str, plot_type: str = 'linear')
+
+   This function plots the given time-series data for easy visualization.
+
+   :param series_x: The independent variable, usually indicating time steps in arbitrary or specific units.
+
+   :type series_x: Pandas Series
+
+   :param series_y: The dependent variable, indicating values of the variable of interest over time.
+
+   :type series_y: Pandas Series (of type float or int)
+
+   :param plt_save_pth: The path where the plot image will be saved.
+
+   :type plt_save_pth: str
+
+   :param plot_type: Can be either 'linear' (default) or 'log'. 'linear' plots series_y v/s series_x,
+       'log' plots the natural log of series_y v/s series_x.
+
+   :type plot_type: str
+
+
+
+.. py:function:: calculate_weekly_concentration_perc_change(conc_data: pandas.Series) -> pandas.Series
+
+   This function computes the weekly percentage change in concentration levels in the given time-series data.
+
+   :param conc_data: The concentration data, assumed to have a periodicity of 1 week.
+
+   :type conc_data: Pandas Series (of type float or int)
+
+   :return: Returns the weekly percentage change in concentration levels.
+
+   :rtype: pd.Series
+
+
+
+.. py:function:: analyze_trends(data: pandas.Series) -> list[float]
+
+   This function computes the trend line for the given data.
+
+   :param data: The time-series data (assumed to be sorted in an increasing order of time).
+
+   :type data: pd.Series
+
+   :return: Returns the trend line values which can be plotted as date v/s returned trend line values.
+
+   :rtype: list
+
+
+
+.. py:function:: change_point_detection(data: pandas.Series, model: str = 'l2', min_size: int = 28, penalty: int = 1)
+
+   This function uses the PELT (Pruned Exact Linear Time) function
+   of the Ruptures library to analyze the given time-series data
+   for change point detection.
+
+   :param data: A Pandas Series containing the time-series data whose change points need to be detected.
+
+   :type data: pd.Series
+
+   :param model: The model used by PELT to perform the analysis. Allowed types include "l1", "l2", and "rbf".
+
+   :type model: str
+
+   :param min_size: The minimum separation (time steps) between two consecutive change points detected by the model.
+
+   :type min_size: int
+
+   :param penalty: The penalty value used during prediction of change points.
+
+   :type penalty: int
+
+   :return: Returns a sorted list of breakpoints.
+
+   :rtype: list
+
+
+
+.. py:function:: normalize_viral_load(data: pandas.DataFrame, to_normalize: str, normalize_by: Union[str, int]) -> pandas.Series
+
+   This function normalizes the time-series data given in
+   the "to_normalize" column of the data using the values
+   in the "normalize_by" column of the data.
+
+   :param data: The Pandas DataFrame containing the relevant data.
+
+   :type data: Pandas DataFrame
+
+   :param to_normalize: The name of the column containing the data to be normalized.
+
+   :type to_normalize: str
+
+   :param normalize_by: The name of the column containing the data to normalize by
+       or the integer value to normalize the data by.
+
+   :type normalize_by: str
+
+   :return: The normalized data.
+
+   :rtype: Pandas Series
+
+
+
+.. py:function:: forecast_single_instance(data: pandas.Series, window: pandas.DatetimeIndex) -> pandas.Series
+
+   This function predicts the value of the given time-series data
+   a single time-step into the future using a Linear Regression
+   model trained on the data specified by the parameter "window_length".
+
+   :param data: A Pandas Series, assumed to have dates as its indices,
+       containing the time-series data whose value needs to be predicted in the future.
+
+   :type data: pd.Series
+
+   :param window: A Pandas DateTimeIndex containing date range for the "data" that must be
+       used to train the Linear Regression model. Minimum length must be 1 week and maximum
+       length can be the entire date range of the "data".
+
+   :type window: pd.DateTimeIndex
+
+   :return: Returns the original "data" with the next time-step prediction appended to it.
+
+   :rtype: pd.Series
+
+
+
+.. py:function:: detect_seasonality(data: pandas.Series, model_type: str = 'additive') -> pandas.DataFrame
+
+   This function analyzes a given time-series data for seasonality.
+
+   :param data: A Pandas Series, assumed to have dates as its indices with the corresponding
+       values of the time-series data.
+
+   :type data: pd.Series
+
+   :param model_type: Can be "additive" or "multiplicative", determines the type of seasonality
+       model assumed for the data.
+
+   :type model_type: str
+
+   :return: Returns a Pandas DataFrame that contain the Trend, Seasonal, and Residual components
+       computed using the given model type. Can be plotted using the "plot" method of Pandas DataFrame class.
+
+   :rtype: pd.DataFrame
+
+
+
+.. py:function:: get_lead_lag_correlations(x: pandas.Series, y: pandas.Series, time_instances: int, plt_save_pth: str, max_lag: int = 3)
+
+   This function computes the lead and lag correlations between two
+   given time-series data.
+
+   :param x: The first time-series data.
+
+   :type x: pd.Series
+
+   :param y: The second time-series data.
+
+   :type y: pd.Series
+
+   :param time_instances: The number of time instances to be considered for the correlation analysis.
+
+   :type time_instances: int
+
+   :param plt_save_pth: The path where the plot image will be saved.
+
+   :type plt_save_pth: str
+
+   :param max_lag: The maximum lag time to be considered for the correlation analysis.
+
+   :type max_lag: int
+
+   :return: Returns the lead and lag correlations between the given time-series data and the buffer
+       where the time-series comparision is stored.
+
+   :rtype: Tuple
+
+
+

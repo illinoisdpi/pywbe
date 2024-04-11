@@ -1,0 +1,46 @@
+:py:mod:`pyWBE.exceptions`
+==========================
+
+.. py:module:: pyWBE.exceptions
+
+.. autoapi-nested-parse::
+
+   =================
+   Custom Exceptions
+   =================
+
+   Contains custom-made exceptions required to handle
+   errors in a way fine-tuned to WBE applications.
+
+
+
+Module Contents
+---------------
+
+.. py:exception:: FunctionNotImplementedError(message: str)
+
+
+   Bases: :py:obj:`Exception`
+
+   This class handles the error when a function has not been implemented yet.
+   Used in the development process of pyWBE.
+
+
+.. py:exception:: DurationExceededError(message: str)
+
+
+   Bases: :py:obj:`Exception`
+
+   This class handles the error when window duration is greater than the
+   data duration.
+
+
+.. py:exception:: DurationTooShortError(message: str)
+
+
+   Bases: :py:obj:`Exception`
+
+   This class handles the error when window duration is too small for
+   training.
+
+

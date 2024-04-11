@@ -1,0 +1,297 @@
+:py:mod:`pyWBE.reporting`
+=========================
+
+.. py:module:: pyWBE.reporting
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyWBE.reporting.get_html_table
+   pyWBE.reporting.create_doc_report
+   pyWBE.reporting.plot_trends
+   pyWBE.reporting.plot_conc_change
+   pyWBE.reporting.plot_change_pt_detect
+   pyWBE.reporting.plot_seasonality
+   pyWBE.reporting.plot_normalize
+   pyWBE.reporting.plot_forecast
+   pyWBE.reporting.generate_report_from_data
+
+
+
+.. py:function:: get_html_table(df: pandas.DataFrame)
+
+   This function takes a pandas DataFrame and returns an HTML table. 
+
+   :param df: pandas DataFrame. 
+
+   : type df: pd.DataFrame. 
+
+   :return: str. 
+
+
+
+.. py:function:: create_doc_report(doc_path: str, time_series_plot: str, trend_plot: str, conc_change_plot: str, change_pt_detect_plot: str, seasonality_plot: str, normalize_plot: str, forecast_plot: str, lead_lag_plot: str, lead_table: pandas.DataFrame, lag_table: pandas.DataFrame)
+
+   This function takes the paths to the plots and tables and creates a DOCX report. 
+
+   :param doc_path: Path to save the DOCX report. 
+
+   :type doc_path: str. 
+
+   :param time_series_plot: Path to the time-series plot. 
+
+   :type time_series_plot: str. 
+
+   :param trend_plot: Path to the trend plot. 
+
+   :type trend_plot: str. 
+
+   :param conc_change_plot: Path to the concentration change plot. 
+
+   :type conc_change_plot: str. 
+
+   :param change_pt_detect_plot: Path to the change point detection plot. 
+
+   :type change_pt_detect_plot: str. 
+
+   :param seasonality_plot: Path to the seasonality plot. 
+
+   :type seasonality_plot: str. 
+
+   :param normalize_plot: Path to the normalized plot. 
+
+   :type normalize_plot: str. 
+
+   :param forecast_plot: Path to the forecast plot. 
+
+   :type forecast_plot: str. 
+
+   :param lead_lag_plot: Path to the lead-lag plot. 
+
+   :type lead_lag_plot: str. 
+
+   :param lead_table: Lead correlations table. 
+
+   :type lead_table: pd.DataFrame. 
+
+   :param lag_table: Lag correlations table. 
+
+   :type lag_table: pd.DataFrame. 
+
+
+
+.. py:function:: plot_trends(data: pandas.Series, trend_plot_pth: str)
+
+   This function takes a time-series data, plots the trend of the data and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.Series. 
+
+   :param trend_plot_pth: Path to save the trend plot. 
+
+   :type trend_plot_pth: str. 
+
+
+
+.. py:function:: plot_conc_change(data: pandas.Series, conc_change_plot_pth: str)
+
+   This function calculates the weekly concentration percentage change, plots it and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.Series. 
+
+   :param conc_change_plot_pth: Path to save the weekly concentration percentage change plot. 
+
+   :type conc_change_plot_pth: str. 
+
+
+
+.. py:function:: plot_change_pt_detect(data: pandas.Series, change_pt_detect_plot_pth: str, model: str = 'l2', min_size: int = 28, penalty: int = 1)
+
+   This function detects change points in the time-series data, plots it and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.Series. 
+
+   :param change_pt_detect_plot_pth: Path to save the change point detection plot. 
+
+   :type change_pt_detect_plot_pth: str. 
+
+   :param model: Change point detection model. 
+
+   :type model: str. 
+
+   :param min_size: The minimum separation (time steps) between
+   two consecutive change points detected by the model.
+
+   :type min_size: int. 
+
+   :param penalty: The penalty to be used in the model. 
+
+   :type penalty: int. 
+
+
+
+.. py:function:: plot_seasonality(data: pandas.Series, seasonality_plot_pth: str, model_type: str = 'additive')
+
+   This function detects the seasonality in the time-series data, plots it and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.Series. 
+
+   :param seasonality_plot_pth: Path to save the seasonality plot. 
+
+   :type seasonality_plot_pth: str. 
+
+   :param model_type: Seasonality model type. 
+
+   :type model_type: str. 
+
+
+
+.. py:function:: plot_normalize(data: pandas.DataFrame, normalize_plot_pth: str, to_normalize: str, normalize_by: Union[str, int])
+
+   This function normalizes the time-series data, plots it and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.DataFrame. 
+
+   :param normalize_plot_pth: Path to save the normalized plot. 
+
+   :type normalize_plot_pth: str. 
+
+   :param to_normalize: Column to normalize. 
+
+   :type to_normalize: str. 
+
+   :param normalize_by: Column or integet value to normalize by. 
+
+   :type normalize_by: str. 
+
+
+
+.. py:function:: plot_forecast(data: pandas.Series, forecast_plot_pth: str, window: pandas.DatetimeIndex)
+
+   This function forecasts the time-series data, plots it and saves it. 
+
+   :param data: Time-series data. 
+
+   :type data: pd.Series. 
+
+   :param forecast_plot_pth: Path to save the forecast plot. 
+
+   :type forecast_plot_pth: str. 
+
+   :param window: Forecast window. 
+
+   :type window: pd.DatetimeIndex. 
+
+
+
+.. py:function:: generate_report_from_data(data_1: pandas.DataFrame, data_2: pandas.Series, value_col: str, normalize_using_col: str, forecast_window: pandas.DatetimeIndex, lead_lag_time_instances: int, lead_lag_max_lag: int, pdf_path: str, time_series_plot_pth: str, trend_plot_pth: str, conc_change_plot_pth: str, change_pt_detect_plot_pth: str, seasonality_plot_pth: str, normalize_plot_pth: str, forecast_plot_pth: str, lead_lag_plot_pth: str, plot_type: str = 'linear', change_pt_model: str = 'l2', change_pt_min_size: int = 28, change_pt_penalty: int = 1, seasonality_model: str = 'additive')
+
+   This function generates a PDF report from the given data. 
+
+   :param data_1: Primary time-series data to perform analysis on. 
+
+   :type data_1: pd.DataFrame. 
+
+   :param data_2: Secondary time-series data to be used for correlation analysis. 
+
+   :type data_2: pd.Series. 
+
+   :param value_col: Column name indicating values of interest in data_1. 
+
+   :type value_col: str. 
+
+   :param normalize_using_col: Column name to normalize "values" in data_1 by. 
+
+   :type normalize_using_col: str. 
+
+   :param forecast_window: Forecast window for the time-series data. 
+
+   :type forecast_window: pd.DatetimeIndex. 
+
+   :param lead_lag_time_instances: Number of time instances to consider for lead-lag correlation. 
+
+   :type lead_lag_time_instances: int. 
+
+   :param lead_lag_max_lag: Maximum lag to consider for lead-lag correlation. 
+
+   :type lead_lag_max_lag: int. 
+
+   :param pdf_path: Path to save the PDF report. 
+
+   :type pdf_path: str. 
+
+   :param time_series_plot_pth: Path to save the time-series plot. 
+
+   :type time_series_plot_pth: str. 
+
+   :param trend_plot_pth: Path to save the trend plot. 
+
+   :type trend_plot_pth: str. 
+
+   :param conc_change_plot_pth: Path to save the concentration change plot. 
+
+   :type conc_change_plot_pth: str. 
+
+   :param change_pt_detect_plot_pth: Path to save the change point detection plot. 
+
+   :type change_pt_detect_plot_pth: str. 
+
+   :param seasonality_plot_pth: Path to save the seasonality plot. 
+
+   :type seasonality_plot_pth: str. 
+
+   :param normalize_plot_pth: Path to save the normalized plot. 
+
+   :type normalize_plot_pth: str. 
+
+   :param forecast_plot_pth: Path to save the forecast plot. 
+
+   :type forecast_plot_pth: str. 
+
+   :param lead_lag_plot_pth: Path to save the lead-lag plot. 
+
+   :type lead_lag_plot_pth: str. 
+
+   :param plot_type: Type of plot to be used for time-series data. 
+
+   :type plot_type: str. 
+
+   :param change_pt_model: Change point detection model. 
+
+   :type change_pt_model: str. 
+
+   :param change_pt_min_size: The minimum separation (time steps) between
+   two consecutive change points detected by the model.
+
+   :type change_pt_min_size: int. 
+
+   :param change_pt_penalty: The penalty to be used in the model. 
+
+   :type change_pt_penalty: int. 
+
+   :param seasonality_model: Seasonality model type. 
+
+   :type seasonality_model: str. 
+
+   :return: HTML of generated report. 
+
+   :rtype: str. 
+
+
+

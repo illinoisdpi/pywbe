@@ -1,0 +1,17 @@
+:py:mod:`pyWBE`
+===============
+
+.. py:module:: pyWBE
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   exceptions/index.rst
+   preliminary_functions/index.rst
+   reporting/index.rst
+
+

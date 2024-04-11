@@ -8,6 +8,7 @@ from pyWBE.preliminary_functions import (plot_time_series, analyze_trends,
                                          get_lead_lag_correlations)
 import ruptures as rpt
 import pypandoc
+from typing import Union
 
 
 def get_html_table(df: pd.DataFrame):
@@ -282,7 +283,7 @@ def plot_seasonality(data: pd.Series, seasonality_plot_pth: str, model_type: str
     plt.close()
 
 
-def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: str, normalize_by: str):
+def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: str, normalize_by: Union[str, int]):
     """
     This function normalizes the time-series data, plots it and saves it. \n
     :param data: Time-series data. \n
@@ -291,7 +292,7 @@ def plot_normalize(data: pd.DataFrame, normalize_plot_pth: str, to_normalize: st
     :type normalize_plot_pth: str. \n
     :param to_normalize: Column to normalize. \n
     :type to_normalize: str. \n
-    :param normalize_by: Column to normalize by. \n
+    :param normalize_by: Column or integet value to normalize by. \n
     :type normalize_by: str. \n
     """
     normalized_data = normalize_viral_load(data, to_normalize, normalize_by)

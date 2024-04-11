@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.seasonal import seasonal_decompose
 import ruptures as rpt
+from typing import Union
 
 
 def plot_time_series(series_x: pd.Series, series_y: pd.Series, plt_save_pth: str, plot_type: str = "linear"):
@@ -113,7 +114,7 @@ def change_point_detection(data: pd.Series, model: str = "l2",
     return result
 
 
-def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: str) -> pd.Series:
+def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: Union[str, int]) -> pd.Series:
     """
     This function normalizes the time-series data given in
     the "to_normalize" column of the data using the values
@@ -122,15 +123,22 @@ def normalize_viral_load(data: pd.DataFrame, to_normalize: str, normalize_by: st
     :type data: Pandas DataFrame\n
     :param to_normalize: The name of the column containing the data to be normalized.\n
     :type to_normalize: str\n
-    :param normalize_by: The name of the column containing the data to normalize by.\n
+    :param normalize_by: The name of the column containing the data to normalize by
+        or the integer value to normalize the data by.\n
     :type normalize_by: str\n
     :return: The normalized data.\n
     :rtype: Pandas Series\n
     """
-    if to_normalize in data.columns and normalize_by in data.columns:
-        return data[to_normalize] / data[normalize_by].mean()
+    if isinstance(normalize_by, int):
+        if normalize_by == 0:
+            raise ValueError("The value to normalize by cannot be zero.")
+        else:
+            return data[to_normalize] / normalize_by
     else:
-        raise ValueError(f"The columns {to_normalize} and/or {normalize_by} are not present in the given data.")
+        if to_normalize in data.columns and normalize_by in data.columns:
+            return data[to_normalize] / data[normalize_by].mean()
+        else:
+            raise ValueError(f"The columns {to_normalize} and/or {normalize_by} are not present in the given data.")
 
 
 def forecast_single_instance(data: pd.Series, window: pd.DatetimeIndex) -> pd.Series:
